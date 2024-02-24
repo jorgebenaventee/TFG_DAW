@@ -22,5 +22,8 @@ module.exports = {
   },
   rules: {
     '@typescript-eslint/comma-dangle': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/no-floating-promises': 'off',
+    '@typescript-eslint/space-before-function-paren': 'off',
   },
 }

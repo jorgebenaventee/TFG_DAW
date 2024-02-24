@@ -2,13 +2,16 @@
   "scripts": {
     "dev": "tsx watch src/index.ts"
   },
+  "type": "module",
   "dependencies": {
     "@hono/node-server": "^1.8.1",
     "@prisma/client": "5.10.2",
+    "bcrypt": "^5.1.1",
     "dotenv": "^16.4.5",
     "hono": "^4.0.5"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/node": "^20.11.17",
     "@typescript-eslint/eslint-plugin": "^6.4.0",
     "eslint": "^8.57.0",
@@ -20,7 +23,10 @@
     "eslint-plugin-promise": "^6.0.0",
     "prettier": "^3.2.5",
     "prisma": "^5.10.2",
-    "tsx": "^3.12.2",
+    "tsx": "^3.14.0",
     "typescript": "*"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   }
 }
