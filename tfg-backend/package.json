@@ -2,13 +2,15 @@
   "scripts": {
     "dev": "tsx watch src/index.ts"
   },
-  "type": "module",
   "dependencies": {
     "@hono/node-server": "^1.8.1",
+    "@hono/zod-validator": "^0.1.11",
     "@prisma/client": "5.10.2",
     "bcrypt": "^5.1.1",
     "dotenv": "^16.4.5",
-    "hono": "^4.0.5"
+    "hono": "^4.0.5",
+    "jose": "^5.2.2",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",

@@ -8,6 +8,9 @@ dependencies:
   '@hono/node-server':
     specifier: ^1.8.1
     version: 1.8.1
+  '@hono/zod-validator':
+    specifier: ^0.1.11
+    version: 0.1.11(hono@4.0.5)(zod@3.22.4)
   '@prisma/client':
     specifier: 5.10.2
     version: 5.10.2(prisma@5.10.2)
@@ -20,6 +23,12 @@ dependencies:
   hono:
     specifier: ^4.0.5
     version: 4.0.5
+  jose:
+    specifier: ^5.2.2
+    version: 5.2.2
+  zod:
+    specifier: ^3.22.4
+    version: 3.22.4
 
 devDependencies:
   '@types/bcrypt':
@@ -310,6 +319,16 @@ packages:
   /@hono/node-server@1.8.1:
     resolution: {integrity: sha512-9ondWs/5EuyZOd/iyiRp0GQfMEq+IA+IbV8Wy2bgdr5+cC55I3xbQrqtXKprw7jJhfvq3IVw7ALiuvCEmLdCAA==}
     engines: {node: '>=18.14.1'}
+    dev: false
+
+  /@hono/zod-validator@0.1.11(hono@4.0.5)(zod@3.22.4):
+    resolution: {integrity: sha512-PQXeHUP0+36qpRt8yfeD7N2jbK3ETlGvSN6dMof/HwUC/APRokQRjpXZm4rrlG71Ft0aWE01+Bm4XejqPie5Uw==}
+    peerDependencies:
+      hono: '>=3.9.0'
+      zod: ^3.19.1
+    dependencies:
+      hono: 4.0.5
+      zod: 3.22.4
     dev: false
 
   /@humanwhocodes/config-array@0.11.14:
@@ -1766,6 +1785,10 @@ packages:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
     dev: true
 
+  /jose@5.2.2:
+    resolution: {integrity: sha512-/WByRr4jDcsKlvMd1dRJnPfS1GVO3WuKyaurJ/vvXcOaUQO8rnNObCQMlv/5uCceVQIq5Q4WLF44ohsdiTohdg==}
+    dev: false
+
   /js-yaml@4.1.0:
     resolution: {integrity: sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA==}
     hasBin: true
@@ -2521,3 +2544,7 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
     dev: true
+
+  /zod@3.22.4:
+    resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
+    dev: false
