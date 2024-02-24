@@ -3,16 +3,11 @@ import { HTTPException } from 'hono/http-exception'
 import { compare } from 'bcrypt'
 import * as process from 'process'
 import { SignJWT } from 'jose'
+import { type LoginSchema } from '@/schemas/login.schema'
 
 const prisma = new PrismaClient()
 
-async function login({
-  username,
-  password,
-}: {
-  username: string
-  password: string
-}) {
+async function login({ username, password }: LoginSchema) {
   const user = await prisma.user.findUnique({
     where: { username },
   })
