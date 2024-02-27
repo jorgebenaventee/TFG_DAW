@@ -1,18 +1,14 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card.tsx'
+import { createRouter, RouterProvider } from '@tanstack/react-router'
+import { routeTree } from '@/routeTree.gen.ts'
 
-function App () {
-  return (
-    <div className='min-h-screen grid place-content-center'>
-      <Card>
-        <CardHeader>
-          <CardTitle>Inicia sesión</CardTitle>
-        </CardHeader>
-        <CardContent>
-          Holi :)
-        </CardContent>
-      </Card>
-    </div>
-  )
+const router = createRouter({ routeTree })
+declare module '@tanstack/react-router' {
+  interface Register {
+    router: typeof router
+  }
+}
+function App() {
+  return <RouterProvider router={router} />
 }
 
 export default App
