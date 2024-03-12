@@ -9,11 +9,9 @@ export const Route = createLazyFileRoute('/login')({
 function Login() {
   return (
     <div className="grid grid-cols-2 min-h-screen overflow-hidden">
-      <div className="h-full">
-        <div className="p-3 flex justify-end mr-10">
-          <ThemeSwitcher className="inline" />
-        </div>
+      <div className="h-full relative">
         <LoginForm />
+        <ThemeSwitcher className="absolute top-5 right-5" />
       </div>
       <div>
         <img

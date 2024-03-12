@@ -99,8 +99,10 @@ function useLoginForm() {
   const { toast } = useToast()
   const { token, setToken } = useAuthStore()
   const navigate = useNavigate()
+  const queryParams = new URLSearchParams(window.location.search)
+  const redirect = queryParams.get('redirect') ?? '/'
   if (token) {
-    void navigate({ to: '/', replace: true })
+    void navigate({ to: redirect, replace: true })
   }
   const { mutate } = useMutation({
     mutationFn: (data: { username: string; password: string }) =>
@@ -118,7 +120,7 @@ function useLoginForm() {
       }),
     onSuccess: (data) => {
       setToken(data.token)
-      void navigate({ to: '/', replace: true })
+      void navigate({ to: redirect, replace: true })
     },
     onError: (error) => {
       const errorResponse = JSON.parse(error.message)
