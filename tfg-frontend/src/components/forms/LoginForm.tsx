@@ -23,7 +23,11 @@ export function LoginForm() {
     <div className="size-full grid place-content-center">
       <Card>
         <CardHeader>
-          <h1 className="font-bold text-3xl">Iniciar sesión</h1>
+          <img
+            src="/taskify-logo.webp"
+            alt="Logo de Taskify"
+            className="w-full max-w-72 block m-auto"
+          />
         </CardHeader>
         <CardContent>
           <loginForm.Provider>
@@ -82,9 +86,7 @@ export function LoginForm() {
                   </Label>
                 )}
               />
-              <Button variant="default" className="dark:text-white">
-                Iniciar sesión
-              </Button>
+              <Button variant="default">Iniciar sesión</Button>
             </form>
           </loginForm.Provider>
         </CardContent>
