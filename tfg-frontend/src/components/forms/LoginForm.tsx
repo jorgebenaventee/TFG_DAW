@@ -124,7 +124,6 @@ function useLoginForm() {
         variant: 'destructive',
         title: 'Error',
         description: errorResponse.message,
-        status: 'error',
       })
     },
   })
