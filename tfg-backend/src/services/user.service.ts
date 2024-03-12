@@ -7,17 +7,20 @@ import { type LoginSchema } from '@/schemas/login.schema'
 
 const prisma = new PrismaClient()
 
-async function login({ username, password }: LoginSchema) {
+async function login({
+  username,
+  password,
+}: LoginSchema) {
   const user = await prisma.user.findUnique({
     where: { username },
   })
   if (user == null) {
-    throw new HTTPException(401, { message: 'Invalid username or password' })
+    throw new HTTPException(401, { message: 'Usuario o contraseña incorrectos' })
   }
 
   const passwordMatch = await compare(password, user.password)
   if (!passwordMatch) {
-    throw new HTTPException(401, { message: 'Invalid username or password' })
+    throw new HTTPException(401, { message: 'Usuario o contraseña incorrectos' })
   }
   const token = await generateToken(user)
 

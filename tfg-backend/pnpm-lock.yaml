@@ -8,9 +8,12 @@ dependencies:
   '@hono/node-server':
     specifier: ^1.8.1
     version: 1.8.1
+  '@hono/swagger-ui':
+    specifier: ^0.2.1
+    version: 0.2.1(hono@4.1.0)
   '@hono/zod-validator':
     specifier: ^0.1.11
-    version: 0.1.11(hono@4.0.5)(zod@3.22.4)
+    version: 0.1.11(hono@4.1.0)(zod@3.22.4)
   '@prisma/client':
     specifier: 5.10.2
     version: 5.10.2(prisma@5.10.2)
@@ -21,8 +24,8 @@ dependencies:
     specifier: ^16.4.5
     version: 16.4.5
   hono:
-    specifier: ^4.0.5
-    version: 4.0.5
+    specifier: ^4.1.0
+    version: 4.1.0
   jose:
     specifier: ^5.2.2
     version: 5.2.2
@@ -321,13 +324,21 @@ packages:
     engines: {node: '>=18.14.1'}
     dev: false
 
-  /@hono/zod-validator@0.1.11(hono@4.0.5)(zod@3.22.4):
+  /@hono/swagger-ui@0.2.1(hono@4.1.0):
+    resolution: {integrity: sha512-wBxVMRe3/v8xH4o6icmwztiIq0DG0s7+jHVMHVUAoFFCWEQNL2iskMmQtrhSDtsFmBZUeUFQUaaJ6Ir6DOmHLA==}
+    peerDependencies:
+      hono: '*'
+    dependencies:
+      hono: 4.1.0
+    dev: false
+
+  /@hono/zod-validator@0.1.11(hono@4.1.0)(zod@3.22.4):
     resolution: {integrity: sha512-PQXeHUP0+36qpRt8yfeD7N2jbK3ETlGvSN6dMof/HwUC/APRokQRjpXZm4rrlG71Ft0aWE01+Bm4XejqPie5Uw==}
     peerDependencies:
       hono: '>=3.9.0'
       zod: ^3.19.1
     dependencies:
-      hono: 4.0.5
+      hono: 4.1.0
       zod: 3.22.4
     dev: false
 
@@ -1598,8 +1609,8 @@ packages:
       function-bind: 1.1.2
     dev: true
 
-  /hono@4.0.5:
-    resolution: {integrity: sha512-6LEGL1Pf3+dLjVA0NJxAB/3FJ6S3W5qxd/XOG7Wl9YOrpMRZT9lt83R4Ojs8dO6GbAUSutI7zTyjStnSn9sbEg==}
+  /hono@4.1.0:
+    resolution: {integrity: sha512-9no6DCHb4ijB1tWdFXU6JnrnFgzwVZ1cnIcS1BjAFnMcjbtBTOMsQrDrPH3GXbkNEEEkj8kWqcYBy8Qc0bBkJQ==}
     engines: {node: '>=16.0.0'}
     dev: false
 
