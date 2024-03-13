@@ -8,17 +8,16 @@ export const Route = createLazyFileRoute('/login')({
 
 function Login() {
   return (
-    <div className="grid grid-cols-2 min-h-screen overflow-hidden">
-      <div className="h-full relative">
+    <div className="grid min-h-screen grid-cols-2 overflow-hidden">
+      <div className="relative h-full">
         <LoginForm />
-        <ThemeSwitcher className="absolute top-5 right-5" />
+        <ThemeSwitcher className="absolute right-5 top-5" />
       </div>
       <div>
         <img
-          src="/8970fda24f3e1a8d763ae54c04d04ecb.webp"
-          // src="public/login-form-photo.webp"
+          src="/login-form-photo.webp"
           alt="Imagen del formulario de login"
-          className="w-full h-full object-cover"
+          className="h-full w-full object-cover"
         />
       </div>
     </div>
