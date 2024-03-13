@@ -1,5 +1,4 @@
 import {
-  integer,
   pgEnum,
   pgTable,
   primaryKey,
@@ -9,11 +8,11 @@ import {
   uuid,
   varchar,
 } from 'drizzle-orm/pg-core'
-import { relations, sql } from 'drizzle-orm'
+import { type InferSelectModel, relations } from 'drizzle-orm'
 
-export const userBoardRole = pgEnum('UserBoardRole', ['ADMIN', 'USER'])
+export const userBoardRole = pgEnum('UserBoardRole', ['ADMIN', 'USER'] as const)
 
-export const user = pgTable(
+export const userTable = pgTable(
   'User',
   {
     username: varchar('username', { length: 50 }).notNull(),
@@ -27,29 +26,30 @@ export const user = pgTable(
   },
 )
 
-export const board = pgTable('Board', {
-  id: uuid('id').primaryKey().notNull(),
+export const boardTable = pgTable('Board', {
+  id: uuid('id').primaryKey().notNull().defaultRandom(),
   name: varchar('name', { length: 50 }).notNull(),
+  image: varchar('image', { length: 255 }),
 })
 
-export const column = pgTable('Column', {
-  id: uuid('id').primaryKey().notNull(),
+export const columnTable = pgTable('Column', {
+  id: uuid('id').primaryKey().notNull().defaultRandom(),
   name: varchar('name', { length: 255 }).notNull(),
   boardId: uuid('boardId')
     .notNull()
-    .references(() => board.id, {
+    .references(() => boardTable.id, {
       onDelete: 'restrict',
       onUpdate: 'cascade',
     }),
 })
 
-export const task = pgTable('Task', {
-  id: uuid('id').primaryKey().notNull(),
+export const taskTable = pgTable('Task', {
+  id: uuid('id').primaryKey().notNull().defaultRandom(),
   name: varchar('name', { length: 255 }).notNull(),
   description: text('description').notNull(),
   columnId: uuid('columnId')
     .notNull()
-    .references(() => column.id, {
+    .references(() => columnTable.id, {
       onDelete: 'restrict',
       onUpdate: 'cascade',
     }),
@@ -64,47 +64,47 @@ export const task = pgTable('Task', {
   }),
 })
 
-export const tag = pgTable('Tag', {
-  id: uuid('id').primaryKey().notNull(),
+export const tagTable = pgTable('Tag', {
+  id: uuid('id').primaryKey().notNull().defaultRandom(),
   name: varchar('name', { length: 255 }).notNull(),
   color: varchar('color', { length: 7 }).notNull(),
   boardId: uuid('boardId')
     .notNull()
-    .references(() => board.id, {
+    .references(() => boardTable.id, {
       onDelete: 'restrict',
       onUpdate: 'cascade',
     }),
 })
 
-export const comment = pgTable('Comment', {
-  id: uuid('id').primaryKey().notNull(),
+export const commentTable = pgTable('Comment', {
+  id: uuid('id').primaryKey().notNull().defaultRandom(),
   text: text('text').notNull(),
   taskId: uuid('taskId')
     .notNull()
-    .references(() => task.id, {
+    .references(() => taskTable.id, {
       onDelete: 'restrict',
       onUpdate: 'cascade',
     }),
   userId: uuid('userId')
     .notNull()
-    .references(() => user.id, {
+    .references(() => userTable.id, {
       onDelete: 'restrict',
       onUpdate: 'cascade',
     }),
 })
 
-export const userTask = pgTable(
+export const userTaskTable = pgTable(
   'UserTask',
   {
     userId: uuid('userId')
       .notNull()
-      .references(() => user.id, {
+      .references(() => userTable.id, {
         onDelete: 'restrict',
         onUpdate: 'cascade',
       }),
     taskId: uuid('taskId')
       .notNull()
-      .references(() => task.id, {
+      .references(() => taskTable.id, {
         onDelete: 'restrict',
         onUpdate: 'cascade',
       }),
@@ -119,18 +119,18 @@ export const userTask = pgTable(
   },
 )
 
-export const taskTag = pgTable(
+export const taskTagTable = pgTable(
   'TaskTag',
   {
     taskId: uuid('taskId')
       .notNull()
-      .references(() => task.id, {
+      .references(() => taskTable.id, {
         onDelete: 'restrict',
         onUpdate: 'cascade',
       }),
     tagId: uuid('tagId')
       .notNull()
-      .references(() => tag.id, {
+      .references(() => tagTable.id, {
         onDelete: 'restrict',
         onUpdate: 'cascade',
       }),
@@ -145,18 +145,18 @@ export const taskTag = pgTable(
   },
 )
 
-export const userBoard = pgTable(
+export const userBoardTable = pgTable(
   'UserBoard',
   {
     userId: uuid('userId')
       .notNull()
-      .references(() => user.id, {
+      .references(() => userTable.id, {
         onDelete: 'restrict',
         onUpdate: 'cascade',
       }),
     boardId: uuid('boardId')
       .notNull()
-      .references(() => board.id, {
+      .references(() => boardTable.id, {
         onDelete: 'restrict',
         onUpdate: 'cascade',
       }),
@@ -174,51 +174,98 @@ export const userBoard = pgTable(
 
 // add relations
 
-export const boardRelations = relations(board, ({ one, many }) => ({
-  columns: many(column),
-  tag: many(tag),
-  userBoard: many(userBoard),
+export const boardRelations = relations(boardTable, ({ one, many }) => ({
+  columns: many(columnTable),
+  tag: many(tagTable),
+  userBoard: many(userBoardTable),
 }))
 
-export const columnRelations = relations(column, ({ one, many }) => ({
-  board: one(board, { fields: [column.boardId], references: [board.id] }),
-  tasks: many(task),
+export const columnRelations = relations(columnTable, ({ one, many }) => ({
+  board: one(boardTable, {
+    fields: [columnTable.boardId],
+    references: [boardTable.id],
+  }),
+  tasks: many(taskTable),
 }))
 
-export const taskRelations = relations(task, ({ one, many }) => ({
-  column: one(column, { fields: [task.columnId], references: [column.id] }),
-  comments: many(comment),
-  taskTags: many(taskTag),
-  userTasks: many(userTask),
+export const taskRelations = relations(taskTable, ({ one, many }) => ({
+  column: one(columnTable, {
+    fields: [taskTable.columnId],
+    references: [columnTable.id],
+  }),
+  comments: many(commentTable),
+  taskTags: many(taskTagTable),
+  userTasks: many(userTaskTable),
 }))
 
-export const tagRelations = relations(tag, ({ one, many }) => ({
-  board: one(board, { fields: [tag.boardId], references: [board.id] }),
-  taskTags: many(taskTag),
+export const tagRelations = relations(tagTable, ({ one, many }) => ({
+  board: one(boardTable, {
+    fields: [tagTable.boardId],
+    references: [boardTable.id],
+  }),
+  taskTags: many(taskTagTable),
 }))
 
-export const commentRelations = relations(comment, ({ one, many }) => ({
-  task: one(task, { fields: [comment.taskId], references: [task.id] }),
-  user: one(user, { fields: [comment.userId], references: [user.id] }),
+export const commentRelations = relations(commentTable, ({ one, many }) => ({
+  task: one(taskTable, {
+    fields: [commentTable.taskId],
+    references: [taskTable.id],
+  }),
+  user: one(userTable, {
+    fields: [commentTable.userId],
+    references: [userTable.id],
+  }),
 }))
 
-export const userRelations = relations(user, ({ one, many }) => ({
-  userBoards: many(userBoard),
-  userTasks: many(userTask),
-  comments: many(comment),
+export const userRelations = relations(userTable, ({ one, many }) => ({
+  userBoards: many(userBoardTable),
+  userTasks: many(userTaskTable),
+  comments: many(commentTable),
 }))
 
-export const userBoardRelations = relations(userBoard, ({ one, many }) => ({
-  user: one(user, { fields: [userBoard.userId], references: [user.id] }),
-  board: one(board, { fields: [userBoard.boardId], references: [board.id] }),
+export const userBoardRelations = relations(
+  userBoardTable,
+  ({ one, many }) => ({
+    user: one(userTable, {
+      fields: [userBoardTable.userId],
+      references: [userTable.id],
+    }),
+    board: one(boardTable, {
+      fields: [userBoardTable.boardId],
+      references: [boardTable.id],
+    }),
+  }),
+)
+
+export const userTaskRelations = relations(userTaskTable, ({ one, many }) => ({
+  user: one(userTable, {
+    fields: [userTaskTable.userId],
+    references: [userTable.id],
+  }),
+  task: one(taskTable, {
+    fields: [userTaskTable.taskId],
+    references: [taskTable.id],
+  }),
 }))
 
-export const userTaskRelations = relations(userTask, ({ one, many }) => ({
-  user: one(user, { fields: [userTask.userId], references: [user.id] }),
-  task: one(task, { fields: [userTask.taskId], references: [task.id] }),
+export const taskTagRelations = relations(taskTagTable, ({ one, many }) => ({
+  task: one(taskTable, {
+    fields: [taskTagTable.taskId],
+    references: [taskTable.id],
+  }),
+  tag: one(tagTable, {
+    fields: [taskTagTable.tagId],
+    references: [tagTable.id],
+  }),
 }))
 
-export const taskTagRelations = relations(taskTag, ({ one, many }) => ({
-  task: one(task, { fields: [taskTag.taskId], references: [task.id] }),
-  tag: one(tag, { fields: [taskTag.tagId], references: [tag.id] }),
-}))
+export type User = InferSelectModel<typeof userTable>
+export type Board = InferSelectModel<typeof boardTable>
+export type Column = InferSelectModel<typeof columnTable>
+export type Task = InferSelectModel<typeof taskTable>
+export type Tag = InferSelectModel<typeof tagTable>
+export type Comment = InferSelectModel<typeof commentTable>
+export type UserTask = InferSelectModel<typeof userTaskTable>
+export type TaskTag = InferSelectModel<typeof taskTagTable>
+export type UserBoard = InferSelectModel<typeof userBoardTable>
+export type UserBoardRole = (typeof userBoardRole.enumValues)[number]

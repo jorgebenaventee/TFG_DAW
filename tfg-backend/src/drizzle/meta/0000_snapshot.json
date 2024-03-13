@@ -1,105 +1,9 @@
 {
-  "id": "00000000-0000-0000-0000-000000000000",
-  "prevId": "",
+  "id": "32443958-7760-4c7f-a341-1a22deb29568",
+  "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
   "tables": {
-    "_prisma_migrations": {
-      "name": "_prisma_migrations",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "varchar(36)",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "checksum": {
-          "name": "checksum",
-          "type": "varchar(64)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "finished_at": {
-          "name": "finished_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "migration_name": {
-          "name": "migration_name",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "logs": {
-          "name": "logs",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "rolled_back_at": {
-          "name": "rolled_back_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "started_at": {
-          "name": "started_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "applied_steps_count": {
-          "name": "applied_steps_count",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "User": {
-      "name": "User",
-      "schema": "",
-      "columns": {
-        "username": {
-          "name": "username",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "password": {
-          "name": "password",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true
-        }
-      },
-      "indexes": {
-        "User_username_key": {
-          "name": "User_username_key",
-          "columns": [
-            "username"
-          ],
-          "isUnique": true
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
     "Board": {
       "name": "Board",
       "schema": "",
@@ -147,11 +51,119 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "Column_boardId_fkey": {
-          "name": "Column_boardId_fkey",
+        "Column_boardId_Board_id_fk": {
+          "name": "Column_boardId_Board_id_fk",
           "tableFrom": "Column",
           "tableTo": "Board",
-          "schemaTo": "public",
+          "columnsFrom": [
+            "boardId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "Comment": {
+      "name": "Comment",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "taskId": {
+          "name": "taskId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "Comment_taskId_Task_id_fk": {
+          "name": "Comment_taskId_Task_id_fk",
+          "tableFrom": "Comment",
+          "tableTo": "Task",
+          "columnsFrom": [
+            "taskId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "cascade"
+        },
+        "Comment_userId_User_id_fk": {
+          "name": "Comment_userId_User_id_fk",
+          "tableFrom": "Comment",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "Tag": {
+      "name": "Tag",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "color": {
+          "name": "color",
+          "type": "varchar(7)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "boardId": {
+          "name": "boardId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "Tag_boardId_Board_id_fk": {
+          "name": "Tag_boardId_Board_id_fk",
+          "tableFrom": "Tag",
+          "tableTo": "Board",
           "columnsFrom": [
             "boardId"
           ],
@@ -214,11 +226,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "Task_columnId_fkey": {
-          "name": "Task_columnId_fkey",
+        "Task_columnId_Column_id_fk": {
+          "name": "Task_columnId_Column_id_fk",
           "tableFrom": "Task",
           "tableTo": "Column",
-          "schemaTo": "public",
           "columnsFrom": [
             "columnId"
           ],
@@ -230,177 +241,6 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "Tag": {
-      "name": "Tag",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "color": {
-          "name": "color",
-          "type": "varchar(7)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "boardId": {
-          "name": "boardId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "Tag_boardId_fkey": {
-          "name": "Tag_boardId_fkey",
-          "tableFrom": "Tag",
-          "tableTo": "Board",
-          "schemaTo": "public",
-          "columnsFrom": [
-            "boardId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "restrict",
-          "onUpdate": "cascade"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "Comment": {
-      "name": "Comment",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "text": {
-          "name": "text",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "taskId": {
-          "name": "taskId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "userId": {
-          "name": "userId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "Comment_userId_fkey": {
-          "name": "Comment_userId_fkey",
-          "tableFrom": "Comment",
-          "tableTo": "User",
-          "schemaTo": "public",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "restrict",
-          "onUpdate": "cascade"
-        },
-        "Comment_taskId_fkey": {
-          "name": "Comment_taskId_fkey",
-          "tableFrom": "Comment",
-          "tableTo": "Task",
-          "schemaTo": "public",
-          "columnsFrom": [
-            "taskId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "restrict",
-          "onUpdate": "cascade"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "UserTask": {
-      "name": "UserTask",
-      "schema": "",
-      "columns": {
-        "userId": {
-          "name": "userId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "taskId": {
-          "name": "taskId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "UserTask_userId_fkey": {
-          "name": "UserTask_userId_fkey",
-          "tableFrom": "UserTask",
-          "tableTo": "User",
-          "schemaTo": "public",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "restrict",
-          "onUpdate": "cascade"
-        },
-        "UserTask_taskId_fkey": {
-          "name": "UserTask_taskId_fkey",
-          "tableFrom": "UserTask",
-          "tableTo": "Task",
-          "schemaTo": "public",
-          "columnsFrom": [
-            "taskId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "restrict",
-          "onUpdate": "cascade"
-        }
-      },
-      "compositePrimaryKeys": {
-        "UserTask_pkey": {
-          "name": "UserTask_pkey",
-          "columns": [
-            "userId",
-            "taskId"
-          ]
-        }
-      },
       "uniqueConstraints": {}
     },
     "TaskTag": {
@@ -422,11 +262,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "TaskTag_taskId_fkey": {
-          "name": "TaskTag_taskId_fkey",
+        "TaskTag_taskId_Task_id_fk": {
+          "name": "TaskTag_taskId_Task_id_fk",
           "tableFrom": "TaskTag",
           "tableTo": "Task",
-          "schemaTo": "public",
           "columnsFrom": [
             "taskId"
           ],
@@ -436,11 +275,10 @@
           "onDelete": "restrict",
           "onUpdate": "cascade"
         },
-        "TaskTag_tagId_fkey": {
-          "name": "TaskTag_tagId_fkey",
+        "TaskTag_tagId_Tag_id_fk": {
+          "name": "TaskTag_tagId_Tag_id_fk",
           "tableFrom": "TaskTag",
           "tableTo": "Tag",
-          "schemaTo": "public",
           "columnsFrom": [
             "tagId"
           ],
@@ -460,6 +298,43 @@
           ]
         }
       },
+      "uniqueConstraints": {}
+    },
+    "User": {
+      "name": "User",
+      "schema": "",
+      "columns": {
+        "username": {
+          "name": "username",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "password": {
+          "name": "password",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        }
+      },
+      "indexes": {
+        "User_username_key": {
+          "name": "User_username_key",
+          "columns": [
+            "username"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
     "UserBoard": {
@@ -488,11 +363,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "UserBoard_userId_fkey": {
-          "name": "UserBoard_userId_fkey",
+        "UserBoard_userId_User_id_fk": {
+          "name": "UserBoard_userId_User_id_fk",
           "tableFrom": "UserBoard",
           "tableTo": "User",
-          "schemaTo": "public",
           "columnsFrom": [
             "userId"
           ],
@@ -502,11 +376,10 @@
           "onDelete": "restrict",
           "onUpdate": "cascade"
         },
-        "UserBoard_boardId_fkey": {
-          "name": "UserBoard_boardId_fkey",
+        "UserBoard_boardId_Board_id_fk": {
+          "name": "UserBoard_boardId_Board_id_fk",
           "tableFrom": "UserBoard",
           "tableTo": "Board",
-          "schemaTo": "public",
           "columnsFrom": [
             "boardId"
           ],
@@ -527,6 +400,63 @@
         }
       },
       "uniqueConstraints": {}
+    },
+    "UserTask": {
+      "name": "UserTask",
+      "schema": "",
+      "columns": {
+        "userId": {
+          "name": "userId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "taskId": {
+          "name": "taskId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "UserTask_userId_User_id_fk": {
+          "name": "UserTask_userId_User_id_fk",
+          "tableFrom": "UserTask",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "cascade"
+        },
+        "UserTask_taskId_Task_id_fk": {
+          "name": "UserTask_taskId_Task_id_fk",
+          "tableFrom": "UserTask",
+          "tableTo": "Task",
+          "columnsFrom": [
+            "taskId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "UserTask_pkey": {
+          "name": "UserTask_pkey",
+          "columns": [
+            "userId",
+            "taskId"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
     }
   },
   "enums": {
@@ -540,8 +470,8 @@
   },
   "schemas": {},
   "_meta": {
+    "columns": {},
     "schemas": {},
-    "tables": {},
-    "columns": {}
+    "tables": {}
   }
 }
