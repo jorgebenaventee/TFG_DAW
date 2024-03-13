@@ -1,0 +1,27 @@
+{
+  "version": "5",
+  "dialect": "pg",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1710350623424,
+      "tag": "0000_useful_robin_chapel",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1710352005491,
+      "tag": "0001_amazing_hairball",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1710353398009,
+      "tag": "0002_chief_squadron_sinister",
+      "breakpoints": true
+    }
+  ]
+}

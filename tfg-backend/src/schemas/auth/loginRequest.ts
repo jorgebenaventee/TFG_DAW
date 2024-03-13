@@ -5,4 +5,4 @@ export const loginSchema = z.object({
   password: z.string().min(1, 'La contraseña es requerida'),
 })
 
-export type LoginSchema = z.infer<typeof loginSchema>
+export type LoginRequest = z.infer<typeof loginSchema>

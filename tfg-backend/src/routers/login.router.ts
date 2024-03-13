@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { userService } from '@/services/user.service'
-import { loginSchema } from '@/schemas/login.schema'
+import { loginSchema } from '@/schemas/auth/loginRequest'
 
 const router = new Hono()
 

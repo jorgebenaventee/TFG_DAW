@@ -1,16 +1,20 @@
 {
   "scripts": {
-    "dev": "tsx watch src/index.ts"
+    "dev": "tsx watch src/index.ts",
+    "drizzle:generate": "drizzle-kit generate:pg",
+    "drizzle:push": "drizzle-kit push:pg",
+    "drizzle:seed": "tsx src/drizzle/seed.ts"
   },
   "dependencies": {
     "@hono/node-server": "^1.8.1",
     "@hono/swagger-ui": "^0.2.1",
     "@hono/zod-validator": "^0.1.11",
-    "@prisma/client": "5.10.2",
     "bcrypt": "^5.1.1",
     "dotenv": "^16.4.5",
+    "drizzle-orm": "^0.30.1",
     "hono": "^4.1.0",
     "jose": "^5.2.2",
+    "pg": "^8.11.3",
     "pino": "^8.19.0",
     "pino-pretty": "^10.3.1",
     "zod": "^3.22.4"
@@ -18,7 +22,9 @@
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
     "@types/node": "^20.11.17",
+    "@types/pg": "^8.11.2",
     "@typescript-eslint/eslint-plugin": "^6.4.0",
+    "drizzle-kit": "^0.20.14",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-config-standard-with-typescript": "^43.0.1",
@@ -27,11 +33,7 @@
     "eslint-plugin-prettier": "^5.1.3",
     "eslint-plugin-promise": "^6.0.0",
     "prettier": "^3.2.5",
-    "prisma": "^5.10.2",
     "tsx": "^3.14.0",
     "typescript": "*"
-  },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
   }
 }

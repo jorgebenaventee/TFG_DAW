@@ -1,15 +1,13 @@
-import { PrismaClient, type User } from '@prisma/client'
 import { HTTPException } from 'hono/http-exception'
 import { compare } from 'bcrypt'
 import * as process from 'process'
 import { SignJWT } from 'jose'
-import { type LoginSchema } from '@/schemas/login.schema'
+import { type LoginRequest } from '@/schemas/auth/loginRequest'
 import { getLogger } from '@/utils/get-logger'
 
-const prisma = new PrismaClient()
 const logger = getLogger()
 
-async function login({ username, password }: LoginSchema) {
+async function login({ username, password }: LoginRequest) {
   logger.info('Login attempt %o', { username })
   const user = await prisma.user.findUnique({
     where: { username },
