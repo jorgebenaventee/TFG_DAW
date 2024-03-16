@@ -10,9 +10,8 @@ import { logger } from 'hono/logger'
 import { client, db } from '@/drizzle/db'
 import { migrate } from 'drizzle-orm/node-postgres/migrator'
 import * as path from 'path'
-import { hash } from 'bcrypt'
-import { userTable } from '@/drizzle/schema'
 import boardRouter from '@/routers/board.router'
+import { swaggerUI } from '@hono/swagger-ui'
 
 configDotenv()
 
@@ -36,6 +35,7 @@ declare global {
 const app = new Hono().basePath('/api')
 app.use('*', cors())
 app.use(logger())
+app.get('/ui', swaggerUI({ url: '/doc' }))
 app.route('/auth', loginRouter)
 app.use('*', jwt({ secret: process.env.JWT_SECRET, alg: 'HS512' }))
 app.route('/board', boardRouter)

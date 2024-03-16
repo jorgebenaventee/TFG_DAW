@@ -1,32 +1,21 @@
-import { createFormFactory } from '@tanstack/react-form'
 import { Label } from '@/components/ui/label.tsx'
 import { Input } from '@/components/ui/input.tsx'
 import { Card, CardContent, CardHeader } from '@/components/ui/card.tsx'
-import { zodValidator } from '@tanstack/zod-form-adapter'
 import { z } from 'zod'
+import { zodValidator } from '@tanstack/zod-form-adapter'
 import { Button } from '@/components/ui/button.tsx'
-import { useAuthStore } from '@/store/auth-store.ts'
-import { useNavigate } from '@tanstack/react-router'
-import { useMutation } from '@tanstack/react-query'
-import { useToast } from '@/components/ui/use-toast.ts'
-
-const formFactory = createFormFactory({
-  defaultValues: {
-    username: '',
-    password: '',
-  },
-})
+import { useLoginForm } from '@/hooks/use-login-form.ts'
 
 export function LoginForm() {
   const { loginForm } = useLoginForm()
   return (
-    <div className="size-full grid place-content-center">
+    <div className="grid size-full place-content-center">
       <Card>
         <CardHeader>
           <img
             src="/taskify-logo.webp"
             alt="Logo de Taskify"
-            className="w-full max-w-72 block m-auto"
+            className="m-auto block w-full max-w-72"
           />
         </CardHeader>
         <CardContent>
@@ -93,50 +82,4 @@ export function LoginForm() {
       </Card>
     </div>
   )
-}
-
-function useLoginForm() {
-  const { toast } = useToast()
-  const { token, setToken } = useAuthStore()
-  const navigate = useNavigate()
-  const queryParams = new URLSearchParams(window.location.search)
-  const redirect = queryParams.get('redirect') ?? '/'
-  if (token) {
-    void navigate({ to: redirect, replace: true })
-  }
-  const { mutate } = useMutation({
-    mutationFn: (data: { username: string; password: string }) =>
-      fetch(`${import.meta.env.VITE_BACK_URL}/auth/login`, {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }).then(async (res) => {
-        const body = await res.json()
-        if (!res.ok) throw new Error(JSON.stringify(body))
-        const response = z.object({ token: z.string() })
-        return response.parseAsync(body)
-      }),
-    onSuccess: (data) => {
-      setToken(data.token)
-      void navigate({ to: redirect, replace: true })
-    },
-    onError: (error) => {
-      const errorResponse = JSON.parse(error.message)
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: errorResponse.message,
-      })
-    },
-  })
-  const loginForm = formFactory.useForm({
-    onSubmit: ({ value }) => {
-      mutate(value)
-    },
-  })
-  return {
-    loginForm,
-  }
 }

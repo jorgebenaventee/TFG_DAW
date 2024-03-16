@@ -9,6 +9,12 @@ import { boardService } from '@/services/board.service'
 
 const router = new Hono()
 
+router.get('/', async (c) => {
+  const { id } = getCurrentPayload(c)
+  const boards = await boardService.getBoards({ userId: id })
+
+  return c.json(boards)
+})
 router.post('/', zValidator('json', createBoardSchema), async (c) => {
   const { id } = getCurrentPayload(c)
   const body = await c.req.json<CreateBoardRequest>()
@@ -19,4 +25,10 @@ router.post('/', zValidator('json', createBoardSchema), async (c) => {
   return c.json(board)
 })
 
+router.delete('/:id', async (c) => {
+  const { id } = getCurrentPayload(c)
+  const boardId = c.req.param('id')
+  await boardService.deleteBoard({ userId: id, boardId })
+  return c.json({ message: 'Tablero eliminado' })
+})
 export default router
