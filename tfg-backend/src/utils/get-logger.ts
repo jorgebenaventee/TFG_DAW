@@ -1,7 +1,5 @@
 import pino from 'pino'
 
-// Get file from which this function is called
-
 export const getLogger = () => {
   return pino({
     level: 'debug',

@@ -76,6 +76,7 @@ export const tagTable = pgTable('Tag', {
     }),
 })
 
+// @ts-expect-error Somehow typescript is not able to infer the type of the parent column
 export const commentTable = pgTable('Comment', {
   id: uuid('id').primaryKey().notNull().defaultRandom(),
   text: text('text').notNull(),
@@ -91,6 +92,10 @@ export const commentTable = pgTable('Comment', {
       onDelete: 'restrict',
       onUpdate: 'cascade',
     }),
+  parentId: uuid('parentId').references(() => commentTable.id, {
+    onDelete: 'restrict',
+    onUpdate: 'cascade',
+  }),
 })
 
 export const userTaskTable = pgTable(
@@ -214,6 +219,10 @@ export const commentRelations = relations(commentTable, ({ one, many }) => ({
   user: one(userTable, {
     fields: [commentTable.userId],
     references: [userTable.id],
+  }),
+  parent: one(commentTable, {
+    fields: [commentTable.parentId],
+    references: [commentTable.id],
   }),
 }))
 

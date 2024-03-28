@@ -11,7 +11,9 @@ import { client, db } from '@/drizzle/db'
 import { migrate } from 'drizzle-orm/node-postgres/migrator'
 import * as path from 'path'
 import boardRouter from '@/routers/board.router'
+import columnRouter from '@/routers/column.router'
 import { swaggerUI } from '@hono/swagger-ui'
+import { getLogger } from '@/utils/get-logger'
 
 configDotenv()
 
@@ -31,15 +33,27 @@ declare global {
     interface ProcessEnv extends z.infer<typeof envVariables> {}
   }
 }
-
+const log = getLogger()
 const app = new Hono().basePath('/api')
 app.use('*', cors())
 app.use(logger())
 app.get('/ui', swaggerUI({ url: '/doc' }))
 app.route('/auth', loginRouter)
-app.use('*', jwt({ secret: process.env.JWT_SECRET, alg: 'HS512' }))
+app.use(
+  '*',
+  jwt({
+    secret: process.env.JWT_SECRET,
+    alg: 'HS512',
+  }),
+)
 app.route('/board', boardRouter)
-app.onError((e) => {
+app.route('/column', columnRouter)
+app.onError((e, { req }) => {
+  const { method, url } = req
+  log.error(e, 'Error in request', {
+    method,
+    url,
+  })
   if (e instanceof HTTPException) {
     const json = {
       status: e.status,
@@ -64,12 +78,6 @@ app.onError((e) => {
 ;(async () => {
   await client.connect()
   await migrate(db, { migrationsFolder: path.resolve(__dirname, './drizzle') })
-  // if (true) {
-  //   await db.insert(user).values({
-  //     username: 'jorge',
-  //     password: await hash('password', 10),
-  //   })
-  // }
   const port = 5000
   console.log(`Server is running on port ${port}`)
 
