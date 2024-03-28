@@ -1,6 +1,6 @@
 import { Skeleton } from '@/components/ui/skeleton.tsx'
 import { useBoards } from '@/hooks/use-boards.ts'
-import { Board } from '@/api/board-api.ts'
+import { Board, boardApi } from '@/api/board-api.ts'
 import { useEffect, useRef, useState } from 'react'
 import { PlusIcon } from '@/components/icons/plus-icon.tsx'
 import { useCreateBoardForm } from '@/hooks/use-create-board-form.ts'
@@ -21,9 +21,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from './ui/alert-dialog'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiFetch } from '@/utils/api-fetch.ts'
 import { useToast } from '@/components/ui/use-toast.ts'
+
+const className = 'h-52 w-full'
 
 export function BoardList() {
   const { data = [], isLoading } = useBoards()
@@ -50,7 +52,7 @@ function BoardListSkeleton() {
   return (
     <>
       {Array.from({ length: 6 }, (_, i) => (
-        <Skeleton key={i} className="h-36 w-full" />
+        <Skeleton key={i} className={className} />
       ))}
     </>
   )
@@ -75,7 +77,7 @@ function CreateBoardItem() {
   return (
     <div
       ref={ref}
-      className="relative h-36 w-full cursor-pointer rounded bg-accent transition hover:scale-105"
+      className={`relative cursor-pointer rounded bg-accent transition hover:scale-105 ${className}`}
       onClick={() => setShowCreateForm(true)}
     >
       {!showCreateForm && (
@@ -117,6 +119,19 @@ function CreateBoardItem() {
                   </Label>
                 )}
               </createBoardForm.Field>
+              <createBoardForm.Field name="image">
+                {(field) => (
+                  <Label className="flex flex-col gap-2">
+                    Imagen del tablero
+                    <Input
+                      type="file"
+                      className="file:text-white"
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.files?.[0])}
+                    />
+                  </Label>
+                )}
+              </createBoardForm.Field>
               <Button>Crear</Button>
             </form>
           </createBoardForm.Provider>
@@ -151,11 +166,23 @@ function BoardItem({ board }: { board: Board }) {
       })
     },
   })
+  const [image, setImage] = useState<Blob | null>(null)
+  useQuery({
+    queryKey: ['board-image', board.id],
+    queryFn: () =>
+      boardApi.getBoardImage(board).then((blob) => {
+        setImage(blob)
+        return blob
+      }),
+    enabled: !!board.image,
+  })
   return (
-    <div className="group relative h-36 w-full cursor-pointer rounded bg-accent transition hover:scale-105">
-      {board.image && (
+    <div
+      className={`group relative ${className} cursor-pointer rounded bg-accent transition hover:scale-105`}
+    >
+      {image && (
         <img
-          src="https://placehold.co/600x400"
+          src={URL.createObjectURL(image)}
           alt={board.name}
           className="h-full w-full rounded object-cover"
         />

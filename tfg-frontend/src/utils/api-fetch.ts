@@ -14,7 +14,7 @@ type RequestInit = Parameters<typeof fetch>['1']
  * */
 export async function apiFetch<T extends z.ZodTypeAny>(
   endpoint: string,
-  options: RequestInit = {
+  options: RequestInit & { responseIsJson?: boolean } = {
     headers: {
       'Content-Type': 'application/json',
     },
@@ -22,9 +22,9 @@ export async function apiFetch<T extends z.ZodTypeAny>(
   schema?: T,
 ): Promise<z.infer<T>> {
   const token = useAuthStore.getState().token
-  options.headers = {
+  options.responseIsJson ??= true
+  options.headers ??= {
     'Content-Type': 'application/json',
-    ...options.headers,
   }
   if (token) {
     options.headers = {
@@ -40,12 +40,16 @@ export async function apiFetch<T extends z.ZodTypeAny>(
       useAuthStore.getState().setToken(null)
       throw redirect({ to: '/login', replace: true, throw: true })
     }
-    const body = await res.json()
-    if (!res.ok) throw new Error(JSON.stringify(body))
-    if (schema) {
-      const parsed = await schema.parseAsync(body)
-      return parsed as Promise<z.infer<T>>
+    if (options.responseIsJson) {
+      const body = await res.json()
+      if (!res.ok) throw new Error(JSON.stringify(body))
+      if (schema) {
+        const parsed = await schema.parseAsync(body)
+        return parsed as Promise<z.infer<T>>
+      }
+      return body
+    } else {
+      return res
     }
-    return body
   })
 }

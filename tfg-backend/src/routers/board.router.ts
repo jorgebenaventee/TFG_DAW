@@ -1,10 +1,7 @@
 import { Hono } from 'hono'
 import { getCurrentPayload } from '@/utils/get-current-payload'
 import { zValidator } from '@hono/zod-validator'
-import {
-  type CreateBoardRequest,
-  createBoardSchema,
-} from '@/schemas/boards/create-board.schema'
+import { createBoardSchema } from '@/schemas/boards/create-board.schema'
 import { boardService } from '@/services/board.service'
 
 const router = new Hono()
@@ -15,11 +12,22 @@ router.get('/', async (c) => {
 
   return c.json(boards)
 })
-router.post('/', zValidator('json', createBoardSchema), async (c) => {
+
+router.get('/:id/image', async (c) => {
+  const boardId = c.req.param('id')
+  const image = await boardService.getBoardImage({ boardId })
+  return c.newResponse(image)
+})
+
+router.post('/', zValidator('form', createBoardSchema), async (c) => {
   const { id } = getCurrentPayload(c)
-  const body = await c.req.json<CreateBoardRequest>()
+  const formData = await c.req.formData()
+  const name = formData.get('name')
+  const image = formData.get('image')
+  const imageFile = image instanceof File ? image : null
   const board = await boardService.createBoard({
-    ...body,
+    name: String(name),
+    image: imageFile,
     userId: id,
   })
   return c.json(board)
@@ -28,7 +36,10 @@ router.post('/', zValidator('json', createBoardSchema), async (c) => {
 router.delete('/:id', async (c) => {
   const { id } = getCurrentPayload(c)
   const boardId = c.req.param('id')
-  await boardService.deleteBoard({ userId: id, boardId })
+  await boardService.deleteBoard({
+    userId: id,
+    boardId,
+  })
   return c.json({ message: 'Tablero eliminado' })
 })
 export default router
