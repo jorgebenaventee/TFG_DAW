@@ -2,6 +2,7 @@ import { useBoards } from '@/hooks/use-boards.ts'
 import { BoardListSkeleton } from '@/components/BoardListSkeleton.tsx'
 import { CreateBoardItem } from '@/components/CreateBoardItem.tsx'
 import { BoardItem } from '@/components/BoardItem.tsx'
+import { Link } from '@tanstack/react-router'
 
 export function BoardList() {
   const { data = [], isLoading } = useBoards()
@@ -14,7 +15,13 @@ export function BoardList() {
         ) : (
           <>
             {data.map((board) => (
-              <BoardItem key={board.id} board={board} />
+              <Link
+                key={board.id}
+                to="/board/$boardId"
+                params={{ boardId: board.id }}
+              >
+                <BoardItem board={board} />
+              </Link>
             ))}
             <CreateBoardItem />
           </>

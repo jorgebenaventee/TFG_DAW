@@ -9,7 +9,8 @@ import { getCurrentPayload } from '@/utils/get-current-payload'
 const router = new Hono()
 const logger = getLogger()
 router.get('/', zValidator('query', getColumnsSchema), async (c) => {
-  const { boardId, userId } = c.req.query()
+  const { boardId } = c.req.query()
+  const { id: userId } = getCurrentPayload(c)
   logger.info('Obteniendo columnas', {
     boardId,
     userId,

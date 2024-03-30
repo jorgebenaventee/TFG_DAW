@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useToast } from '@/components/ui/use-toast.ts'
 import { apiFetch } from '@/utils/api-fetch.ts'
 import { useState } from 'react'
-import { className } from '@/constants/board.constants.ts'
+import { boardItemClassName } from '@/constants/board.constants.ts'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -53,7 +53,7 @@ export function BoardItem({ board }: { board: Board }) {
   })
   return (
     <div
-      className={`group relative ${className} cursor-pointer rounded bg-accent transition hover:scale-105`}
+      className={`group relative ${boardItemClassName} cursor-pointer rounded bg-accent transition hover:scale-105`}
     >
       {image && (
         <img

@@ -1,0 +1,31 @@
+import { z } from 'zod'
+import { apiFetch } from '@/utils/api-fetch.ts'
+
+export const columnSchema = z.object({
+  id: z.string().uuid(),
+  boardId: z.string().uuid(),
+  name: z.string(),
+  order: z.number(),
+})
+
+const createColumnSchema = columnSchema.omit({ order: true, id: true })
+
+export type Column = z.infer<typeof columnSchema>
+
+function getColumns({ boardId }: { boardId: string }) {
+  const queryParams = new URLSearchParams([['boardId', boardId]])
+  const url = `/column?${queryParams}`
+  return apiFetch(url, {}, z.array(columnSchema))
+}
+
+function createColumn(data: z.infer<typeof createColumnSchema>) {
+  return apiFetch('/column', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
+
+export const columnApi = {
+  getColumns,
+  createColumn,
+}

@@ -1,4 +1,5 @@
 import {
+  integer,
   pgEnum,
   pgTable,
   primaryKey,
@@ -35,6 +36,7 @@ export const boardTable = pgTable('Board', {
 export const columnTable = pgTable('Column', {
   id: uuid('id').primaryKey().notNull().defaultRandom(),
   name: varchar('name', { length: 255 }).notNull(),
+  order: integer('order').notNull().default(0),
   boardId: uuid('boardId')
     .notNull()
     .references(() => boardTable.id, {
@@ -46,7 +48,7 @@ export const columnTable = pgTable('Column', {
 export const taskTable = pgTable('Task', {
   id: uuid('id').primaryKey().notNull().defaultRandom(),
   name: varchar('name', { length: 255 }).notNull(),
-  description: text('description').notNull(),
+  description: text('description'),
   columnId: uuid('columnId')
     .notNull()
     .references(() => columnTable.id, {
@@ -62,6 +64,7 @@ export const taskTable = pgTable('Task', {
     withTimezone: true,
     mode: 'string',
   }),
+  order: integer('order').notNull().default(0),
 })
 
 export const tagTable = pgTable('Tag', {

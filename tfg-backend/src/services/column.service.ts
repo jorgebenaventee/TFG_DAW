@@ -1,5 +1,5 @@
 import { db } from '@/drizzle/db'
-import { and, eq } from 'drizzle-orm'
+import { and, asc, eq } from 'drizzle-orm'
 import { HTTPException } from 'hono/http-exception'
 import { columnTable, userBoardTable } from '@/drizzle/schema'
 import { getLogger } from '@/utils/get-logger'
@@ -25,6 +25,7 @@ async function getColumns({
     .select()
     .from(columnTable)
     .where(eq(columnTable.boardId, boardId))
+    .orderBy(asc(columnTable.order))
 }
 
 async function createColumn({
@@ -41,7 +42,10 @@ async function createColumn({
     userId,
     name,
   })
-  const isAdmin = await hasAdminPermissions({ userId, boardId })
+  const isAdmin = await hasAdminPermissions({
+    userId,
+    boardId,
+  })
   if (!isAdmin) {
     logger.error('No tienes permisos para crear columnas en este tablero', {
       userId,
@@ -52,9 +56,23 @@ async function createColumn({
     })
   }
 
+  const column = await db.query.columnTable.findFirst({
+    columns: {
+      order: true,
+    },
+    where: (columns, { eq }) => eq(columns.boardId, boardId),
+    orderBy: (columns, { desc }) => [desc(columns.order)],
+  })
+
+  const nextOrder = column?.order ?? -1
+
   return await db
     .insert(columnTable)
-    .values({ name, boardId })
+    .values({
+      name,
+      boardId,
+      order: nextOrder + 1,
+    })
     .returning()
     .execute()
 }

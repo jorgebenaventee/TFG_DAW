@@ -1,6 +1,5 @@
 import { z } from 'zod'
 import { useAuthStore } from '@/store/auth-store.ts'
-import { redirect } from '@tanstack/react-router'
 
 // Stop typescript from crying
 type RequestInit = Parameters<typeof fetch>['1']
@@ -38,7 +37,7 @@ export async function apiFetch<T extends z.ZodTypeAny>(
   ).then(async (res) => {
     if (res.status === 401) {
       useAuthStore.getState().setToken(null)
-      throw redirect({ to: '/login', replace: true, throw: true })
+      window.location.reload()
     }
     if (options.responseIsJson) {
       const body = await res.json()

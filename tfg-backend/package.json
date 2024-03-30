@@ -3,7 +3,8 @@
     "dev": "tsx watch src/index.ts",
     "drizzle:generate": "drizzle-kit generate:pg",
     "drizzle:push": "drizzle-kit push:pg",
-    "drizzle:seed": "tsx src/drizzle/seed.ts"
+    "drizzle:seed": "tsx src/drizzle/seed.ts",
+    "drizzle:migrate": "pnpm drizzle:generate && pnpm drizzle:push"
   },
   "dependencies": {
     "@hono/node-server": "^1.8.1",

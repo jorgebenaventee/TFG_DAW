@@ -11,7 +11,9 @@ function Authenticated() {
   return (
     <>
       <Topbar />
-      <Outlet />
+      <main className="h-full w-full">
+        <Outlet />
+      </main>
     </>
   )
 }

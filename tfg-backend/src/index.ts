@@ -77,7 +77,6 @@ app.onError((e, { req }) => {
 })
 ;(async () => {
   await client.connect()
-  await migrate(db, { migrationsFolder: path.resolve(__dirname, './drizzle') })
   const port = 5000
   console.log(`Server is running on port ${port}`)
 

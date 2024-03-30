@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useCreateBoardForm } from '@/hooks/use-create-board-form.ts'
-import { className } from '@/constants/board.constants.ts'
+import { boardItemClassName } from '@/constants/board.constants.ts'
 import { PlusIcon } from '@/components/icons/plus-icon.tsx'
 import { zodValidator } from '@tanstack/zod-form-adapter'
 import { z } from 'zod'
@@ -27,7 +27,7 @@ export function CreateBoardItem() {
   return (
     <div
       ref={ref}
-      className={`relative cursor-pointer rounded bg-accent transition hover:scale-105 ${className}`}
+      className={`relative rounded bg-accent transition hover:scale-105 ${boardItemClassName}`}
       onClick={() => setShowCreateForm(true)}
     >
       {!showCreateForm && (

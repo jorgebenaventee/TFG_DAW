@@ -32,7 +32,25 @@ function getBoardImage({ id }: Board) {
   )
 }
 
+function createBoard(data: Omit<Board, 'id'>) {
+  const formData = new FormData()
+  formData.append('name', data.name)
+  if (data.image != null) {
+    formData.append('image', data.image)
+  }
+  return apiFetch(
+    '/board',
+    {
+      body: formData,
+      method: 'POST',
+      headers: {},
+    },
+    boardSchema,
+  )
+}
+
 export const boardApi = {
   getBoards,
   getBoardImage,
+  createBoard,
 }

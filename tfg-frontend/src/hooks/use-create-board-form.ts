@@ -1,8 +1,8 @@
 import { createFormFactory } from '@tanstack/react-form'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useToast } from '@/components/ui/use-toast.ts'
-import { Board, boardSchema } from '@/api/board-api.ts'
-import { apiFetch } from '@/utils/api-fetch.ts'
+import { boardApi } from '@/api/board-api.ts'
+import { QUERY_KEYS } from '@/constants/query.constants.ts'
 
 const formFactory = createFormFactory<{ name: string; image?: File }>({
   defaultValues: {
@@ -16,28 +16,13 @@ export function useCreateBoardForm() {
   const { toast } = useToast()
 
   const { mutate } = useMutation({
-    mutationFn: (data: Omit<Board, 'id'>) => {
-      const formData = new FormData()
-      formData.append('name', data.name)
-      if (data.image != null) {
-        formData.append('image', data.image)
-      }
-      return apiFetch(
-        '/board',
-        {
-          body: formData,
-          method: 'POST',
-          headers: {},
-        },
-        boardSchema,
-      )
-    },
+    mutationFn: boardApi.createBoard,
     onSuccess: async () => {
       toast({
         title: 'Tablero creado',
         description: 'El tablero ha sido creado con éxito',
       })
-      await queryClient.refetchQueries({ queryKey: ['boards'] })
+      await queryClient.refetchQueries({ queryKey: QUERY_KEYS.BOARDS })
     },
     onError: (error) => {
       const errorResponse = JSON.parse(error.message)
