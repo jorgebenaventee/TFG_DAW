@@ -31,24 +31,26 @@ export async function apiFetch<T extends z.ZodTypeAny>(
       Authorization: `Bearer ${token}`,
     }
   }
-  return await fetch(
-    `${import.meta.env.VITE_BACK_URL}${endpoint}`,
-    options,
-  ).then(async (res) => {
-    if (res.status === 401) {
-      useAuthStore.getState().setToken(null)
-      window.location.reload()
-    }
-    if (options.responseIsJson) {
-      const body = await res.json()
-      if (!res.ok) throw new Error(JSON.stringify(body))
-      if (schema) {
-        const parsed = await schema.parseAsync(body)
-        return parsed as Promise<z.infer<T>>
+  return await fetch(`${import.meta.env.VITE_BACK_URL}${endpoint}`, options)
+    .then(async (res) => {
+      if (res.status === 401) {
+        useAuthStore.getState().setToken(null)
+        window.location.reload()
       }
-      return body
-    } else {
-      return res
-    }
-  })
+      if (options.responseIsJson) {
+        const body = await res.json()
+        if (!res.ok) throw new Error(JSON.stringify(body))
+        if (schema) {
+          return schema.parse(body)
+        }
+        return body
+      } else {
+        return res
+      }
+    })
+    .catch((e) => {
+      console.log('Error in apiFetch')
+      console.error(e)
+      throw e
+    })
 }

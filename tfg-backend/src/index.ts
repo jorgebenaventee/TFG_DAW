@@ -7,13 +7,11 @@ import { HTTPException } from 'hono/http-exception'
 import { cors } from 'hono/cors'
 import { jwt } from 'hono/jwt'
 import { logger } from 'hono/logger'
-import { client, db } from '@/drizzle/db'
-import { migrate } from 'drizzle-orm/node-postgres/migrator'
-import * as path from 'path'
+import { client } from '@/drizzle/db'
 import boardRouter from '@/routers/board.router'
 import columnRouter from '@/routers/column.router'
-import { swaggerUI } from '@hono/swagger-ui'
 import { getLogger } from '@/utils/get-logger'
+import taskRouter from '@/routers/task.router'
 
 configDotenv()
 
@@ -37,7 +35,6 @@ const log = getLogger()
 const app = new Hono().basePath('/api')
 app.use('*', cors())
 app.use(logger())
-app.get('/ui', swaggerUI({ url: '/doc' }))
 app.route('/auth', loginRouter)
 app.use(
   '*',
@@ -48,6 +45,7 @@ app.use(
 )
 app.route('/board', boardRouter)
 app.route('/column', columnRouter)
+app.route('/task', taskRouter)
 app.onError((e, { req }) => {
   const { method, url } = req
   log.error(e, 'Error in request', {

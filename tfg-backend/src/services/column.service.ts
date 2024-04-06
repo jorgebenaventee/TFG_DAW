@@ -1,8 +1,13 @@
 import { db } from '@/drizzle/db'
-import { and, asc, eq } from 'drizzle-orm'
 import { HTTPException } from 'hono/http-exception'
-import { columnTable, userBoardTable } from '@/drizzle/schema'
+import {
+  columnTable,
+  taskTable,
+  type TaskTag,
+  type UserTask,
+} from '@/drizzle/schema'
 import { getLogger } from '@/utils/get-logger'
+import { userBoardService } from '@/services/userboard.service'
 
 const logger = getLogger()
 
@@ -12,7 +17,7 @@ async function getColumns({
 }: {
   boardId: string
   userId: string
-}) {
+}): Promise<ColumnResponse[]> {
   logger.info('Obteniendo columnas', {
     boardId,
     userId,
@@ -21,11 +26,32 @@ async function getColumns({
     boardId,
     userId,
   })
-  return await db
-    .select()
-    .from(columnTable)
-    .where(eq(columnTable.boardId, boardId))
-    .orderBy(asc(columnTable.order))
+  const columns = await db.query.columnTable.findMany({
+    where: (columns, { eq }) => eq(columns.boardId, boardId),
+    orderBy: (columns, { asc }) => [asc(columns.order), asc(taskTable.order)],
+    with: {
+      tasks: {
+        with: {
+          userTasks: true,
+          taskTags: true,
+        },
+      },
+    },
+  })
+  return columns.map((column) => {
+    return {
+      ...column,
+      tasks: column.tasks.map((task) => {
+        return {
+          ...task,
+          assignedTo: task.userTasks.map(
+            (userTask: UserTask) => userTask.userId,
+          ),
+          tags: task.taskTags.map((taskTag: TaskTag) => taskTag.tagId),
+        }
+      }),
+    }
+  }) as ColumnResponse[]
 }
 
 async function createColumn({
@@ -99,32 +125,10 @@ async function checkPermissions({
   boardId: string
   userId: string
 }) {
-  logger.info('Verificando permisos', {
-    boardId,
+  return await userBoardService.checkPermissions({
     userId,
+    boardId,
   })
-  const [userBoard] = await db
-    .select()
-    .from(userBoardTable)
-    .where(
-      and(
-        eq(userBoardTable.userId, userId),
-        eq(userBoardTable.boardId, boardId),
-      ),
-    )
-    .limit(1)
-    .execute()
-  if (userBoard == null) {
-    logger.error('No se encontró el tablero o el usuario no tiene permisos', {
-      boardId,
-      userId,
-    })
-    throw new HTTPException(403, {
-      message: 'No tienes permisos para ver las columnas de este tablero',
-    })
-  }
-
-  return userBoard.role
 }
 
 export const columnService = {

@@ -1,11 +1,13 @@
 import { z } from 'zod'
 import { apiFetch } from '@/utils/api-fetch.ts'
+import { taskSchema } from '@/api/task-api.ts'
 
 export const columnSchema = z.object({
   id: z.string().uuid(),
   boardId: z.string().uuid(),
   name: z.string(),
   order: z.number(),
+  tasks: z.array(taskSchema).optional(),
 })
 
 const createColumnSchema = columnSchema.omit({ order: true, id: true })

@@ -20,14 +20,18 @@ envSchema.parse(import.meta.env)
 //   }
 // }
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      networkMode: 'online',
+    },
+  },
+})
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <ThemeProvider>
-      <QueryClientProvider client={queryClient}>
-        <App />
-        <Toaster />
-      </QueryClientProvider>
-    </ThemeProvider>
-  </React.StrictMode>,
+  <ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <App />
+      <Toaster />
+    </QueryClientProvider>
+  </ThemeProvider>,
 )
