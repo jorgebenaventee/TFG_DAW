@@ -42,6 +42,22 @@ function createTask(data: CreateTask) {
   )
 }
 
+function moveTask(data: {
+  taskId: string
+  newColumnId: string
+  boardId: string
+  order: number
+}) {
+  return apiFetch('/task/move', {
+    method: 'PUT',
+    body: JSON.stringify(data),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+}
+
 export const taskApi = {
   createTask,
+  moveTask,
 }

@@ -41,15 +41,18 @@ async function getColumns({
   return columns.map((column) => {
     return {
       ...column,
-      tasks: column.tasks.map((task) => {
-        return {
-          ...task,
-          assignedTo: task.userTasks.map(
-            (userTask: UserTask) => userTask.userId,
-          ),
-          tags: task.taskTags.map((taskTag: TaskTag) => taskTag.tagId),
-        }
-      }),
+      tasks: column.tasks
+        .map((task) => {
+          return {
+            ...task,
+            assignedTo: task.userTasks.map(
+              (userTask: UserTask) => userTask.userId,
+            ),
+            tags: task.taskTags.map((taskTag: TaskTag) => taskTag.tagId),
+          }
+        })
+        // @ts-expect-error Somehow typescript does not infer this correctly
+        .toSorted((a, b) => a.order - b.order),
     }
   }) as ColumnResponse[]
 }

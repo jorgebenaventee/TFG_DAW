@@ -9,6 +9,7 @@ import {
 } from '@/drizzle/schema'
 import { userBoardService } from '@/services/userboard.service'
 import { getLogger } from '@/utils/get-logger'
+import { eq } from 'drizzle-orm'
 
 const logger = getLogger()
 
@@ -69,6 +70,121 @@ async function createTask({
   })
 
   return savedTask
+}
+
+async function moveTask({
+  userId,
+  taskId,
+  newColumnId,
+  boardId,
+  order,
+}: {
+  userId: string
+  taskId: string
+  newColumnId: string
+  boardId: string
+  order: number
+}) {
+  await checkPermissions({
+    userId,
+    boardId,
+    columnId: newColumnId,
+  })
+  logger.info('Moviendo tarea', {
+    taskId,
+    newColumnId,
+    userId,
+  })
+
+  // Comprobar que ambas columnas estén en el mismo tablero y que sean distintas si el orden no cambia en la tarea
+
+  const task = await db.query.taskTable.findFirst({
+    where: (task, { eq }) => eq(task.id, taskId),
+  })
+  if (task == null) {
+    logger.error('No se encontró la tarea', { taskId })
+    throw new HTTPException(404, {
+      message: `La tarea con id ${taskId} no existe`,
+    })
+  }
+
+  const currentColumn = await db.query.columnTable.findFirst({
+    where: (column, { eq }) => eq(column.id, task.columnId),
+  })
+
+  if (currentColumn == null) {
+    logger.error('No se encontró la columna', { taskId })
+    throw new HTTPException(404, {
+      message: `La columna con id ${task.columnId} no existe`,
+    })
+  }
+
+  if (currentColumn.boardId !== boardId) {
+    logger.error('La columna no pertenece al tablero', { taskId })
+    throw new HTTPException(400, {
+      message: `La columna con id ${task.columnId} no pertenece al tablero con id ${boardId}`,
+    })
+  }
+
+  if (task.columnId === newColumnId && task.order === order) {
+    return
+  }
+
+  const newColumn = await db.query.columnTable.findFirst({
+    where: (column, { eq }) => eq(column.id, newColumnId),
+  })
+
+  if (newColumn == null) {
+    logger.error('No se encontró la nueva columna', { newColumnId })
+    throw new HTTPException(404, {
+      message: `La columna con id ${newColumnId} no existe`,
+    })
+  }
+
+  if (newColumn.boardId !== boardId) {
+    logger.error('La nueva columna no pertenece al tablero', { newColumnId })
+    throw new HTTPException(400, {
+      message: `La columna con id ${newColumnId} no pertenece al tablero con id ${boardId}`,
+    })
+  }
+
+  let currentColumnTasks = await db.query.taskTable.findMany({
+    where: (task, { eq }) => eq(task.columnId, task.columnId),
+  })
+
+  let newColumnTasks = await db.query.taskTable.findMany({
+    where: (task, { eq, and, not }) =>
+      and(eq(task.columnId, newColumnId), not(eq(task.id, taskId))),
+  })
+
+  currentColumnTasks = currentColumnTasks.filter((t) => t.id !== taskId)
+  newColumnTasks.splice(order, 0, task)
+  newColumnTasks = newColumnTasks.filter(
+    (t, index) => newColumnTasks.findIndex((i) => i.id === t.id) === index,
+  )
+
+  for (let i = 0; i < currentColumnTasks.length; i++) {
+    const oldTask = currentColumnTasks[i]
+    await db
+      .update(taskTable)
+      .set({
+        order: i,
+      })
+      .where(eq(taskTable.id, oldTask.id))
+      .execute()
+  }
+
+  for (let i = 0; i < newColumnTasks.length; i++) {
+    const newTask = newColumnTasks[i]
+    await db
+      .update(taskTable)
+      .set({
+        order: i,
+        columnId: newColumnId,
+      })
+      .where(eq(taskTable.id, newTask.id))
+      .execute()
+  }
 }
 
 async function checkPermissions({
@@ -191,4 +307,5 @@ async function insertTaskTags({
 
 export const taskService = {
   createTask,
+  moveTask,
 }
