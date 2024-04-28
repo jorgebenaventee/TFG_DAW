@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils.ts'
 
 export function Task({ task }: { task: TaskType }) {
   const isEndDateBeforeToday =
-    task.endDate && new Date(task.endDate) < new Date()
+    (task.endDate && new Date(task.endDate) < new Date()) ?? false
   return (
     <Card className={cn(isEndDateBeforeToday && 'bg-red-900')}>
       <CardHeader>

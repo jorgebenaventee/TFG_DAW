@@ -10,6 +10,7 @@ import {
 import { userBoardService } from '@/services/userboard.service'
 import { getLogger } from '@/utils/get-logger'
 import { eq } from 'drizzle-orm'
+import { type EditTask } from '@/schemas/tasks/edit-task.schema'
 
 const logger = getLogger()
 
@@ -69,6 +70,75 @@ async function createTask({
     savedTask,
   })
 
+  return savedTask
+}
+
+async function editTask({
+  userId,
+  taskId,
+  newTask,
+}: {
+  userId: string
+  taskId: string
+  newTask: EditTask
+}) {
+  const task = await db.query.taskTable.findFirst({
+    where: (task, { eq }) => eq(task.id, taskId),
+  })
+  if (task == null) {
+    logger.error('No se encontró la tarea', { taskId })
+    throw new HTTPException(404, {
+      message: `La tarea con id ${taskId} no existe`,
+    })
+  }
+
+  await checkPermissions({
+    userId,
+    boardId: newTask.boardId,
+    columnId: newTask.columnId,
+  })
+
+  if (newTask.endDate != null && newTask.startDate != null) {
+    if (newTask.startDate > newTask.endDate) {
+      throw new HTTPException(400, {
+        message: 'La fecha de inicio no puede ser mayor a la fecha de fin',
+      })
+    }
+  }
+
+  const updatedTask: typeof taskTable.$inferInsert = {
+    name: newTask.name,
+    columnId: newTask.columnId,
+    description: newTask.description ?? null,
+    startDate: newTask.startDate?.toISOString() ?? null,
+    endDate: newTask.endDate?.toISOString() ?? null,
+  }
+
+  logger.info('Tarea actualizada', { updatedTask })
+
+  const [savedTask] = await db
+    .update(taskTable)
+    .set(updatedTask)
+    .where(eq(taskTable.id, taskId))
+    .returning()
+    .execute()
+
+  await db
+    .delete(userTaskTable)
+    .where(eq(userTaskTable.taskId, taskId))
+    .execute()
+
+  await db.delete(taskTagTable).where(eq(taskTagTable.taskId, taskId)).execute()
+
+  await insertUserTasks({
+    task: newTask,
+    savedTask: task,
+  })
+
+  await insertTaskTags({
+    task: newTask,
+    savedTask: task,
+  })
   return savedTask
 }
 
@@ -308,4 +378,5 @@ async function insertTaskTags({
 export const taskService = {
   createTask,
   moveTask,
+  editTask,
 }

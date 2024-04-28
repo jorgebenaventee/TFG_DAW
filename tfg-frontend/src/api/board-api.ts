@@ -32,6 +32,19 @@ function getBoardImage({ id }: Board) {
   )
 }
 
+function getUsersInBoard(boardId: string) {
+  return apiFetch(
+    `/userboard/${boardId}/users`,
+    {},
+    z.array(
+      z.object({
+        id: z.string().uuid(),
+        username: z.string(),
+      }),
+    ),
+  )
+}
+
 function createBoard(data: Omit<Board, 'id'>) {
   const formData = new FormData()
   formData.append('name', data.name)
@@ -53,4 +66,5 @@ export const boardApi = {
   getBoards,
   getBoardImage,
   createBoard,
+  getUsersInBoard,
 }

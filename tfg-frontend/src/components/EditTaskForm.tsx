@@ -1,27 +1,33 @@
-import { useCreateTaskForm } from '@/hooks/use-create-task-form.ts'
+import { createTaskSchema, EditTask } from '@/api/task-api.ts'
 import { zodValidator } from '@tanstack/zod-form-adapter'
-import { createTaskSchema } from '@/api/task-api.ts'
 import { Label } from '@/components/ui/label.tsx'
-import { InputErrors } from '@/components/InputErrors.tsx'
 import { Input } from '@/components/ui/input.tsx'
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
-import { Button } from './ui/button'
+import { InputErrors } from '@/components/InputErrors.tsx'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover.tsx'
+import { Button } from '@/components/ui/button.tsx'
+import { cn, formatDate } from '@/lib/utils.ts'
 import { CalendarIcon } from 'lucide-react'
 import { Calendar } from '@/components/ui/calendar.tsx'
-import { cn, formatDate } from '@/lib/utils.ts'
 import { Textarea } from '@/components/ui/textarea.tsx'
+import { useEditTaskForm } from '@/hooks/use-edit-task-form.tsx'
 import { useUsersInBoard } from '@/hooks/use-users-in-board.ts'
 import MultipleSelector, { Option } from '@/components/ui/multiple-selector.tsx'
 
-export function CreateTaskForm({
+export function EditTaskForm({
   boardId,
-  columnId,
+  task,
 }: {
   boardId: string
-  columnId: string
+  task: EditTask
 }) {
-  const { createTaskForm } = useCreateTaskForm({ boardId, columnId })
-  const { data: users, isLoading: usersLoading } = useUsersInBoard({ boardId })
+  const { editTaskForm } = useEditTaskForm({ boardId, task })
+  const { data: users = [], isLoading: usersLoading } = useUsersInBoard({
+    boardId,
+  })
   const { name, startDate, endDate, description, assignedTo, tags } =
     createTaskSchema.shape
   const userOptions: Option[] =
@@ -30,17 +36,17 @@ export function CreateTaskForm({
       value: user.id,
     })) ?? []
   return (
-    <createTaskForm.Provider>
+    <editTaskForm.Provider>
       <form
         className="grid w-full grid-cols-4 gap-4"
         id="create-board-form"
         onSubmit={async (e) => {
           e.preventDefault()
           e.stopPropagation()
-          await createTaskForm.handleSubmit()
+          await editTaskForm.handleSubmit()
         }}
       >
-        <createTaskForm.Field
+        <editTaskForm.Field
           validatorAdapter={zodValidator}
           name="name"
           validators={{
@@ -58,8 +64,8 @@ export function CreateTaskForm({
               <InputErrors field={field} />
             </Label>
           )}
-        </createTaskForm.Field>
-        <createTaskForm.Field
+        </editTaskForm.Field>
+        <editTaskForm.Field
           validatorAdapter={zodValidator}
           name="startDate"
           validators={{ onSubmit: startDate }}
@@ -87,7 +93,7 @@ export function CreateTaskForm({
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
-                    selected={field.getValue()}
+                    selected={field.getValue() ?? undefined}
                     onSelect={(date) => field.handleChange(date)}
                     initialFocus
                   />
@@ -96,8 +102,8 @@ export function CreateTaskForm({
               <InputErrors field={field} />
             </Label>
           )}
-        </createTaskForm.Field>
-        <createTaskForm.Field
+        </editTaskForm.Field>
+        <editTaskForm.Field
           validatorAdapter={zodValidator}
           name="endDate"
           validators={{ onSubmit: endDate }}
@@ -125,7 +131,7 @@ export function CreateTaskForm({
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
-                    selected={field.getValue()}
+                    selected={field.getValue() ?? undefined}
                     onSelect={(date) => field.handleChange(date)}
                     initialFocus
                   />
@@ -134,8 +140,8 @@ export function CreateTaskForm({
               <InputErrors field={field} />
             </Label>
           )}
-        </createTaskForm.Field>
-        <createTaskForm.Field
+        </editTaskForm.Field>
+        <editTaskForm.Field
           validatorAdapter={zodValidator}
           name="assignedTo"
           validators={{ onSubmit: assignedTo }}
@@ -148,7 +154,7 @@ export function CreateTaskForm({
                 disabled={usersLoading}
                 value={field.state.value?.map((s) => ({
                   value: s,
-                  label: users!.find((u) => u.id === s)!.username,
+                  label: users!.find((u) => u.id === s)?.username ?? '',
                 }))}
                 onChange={(value) =>
                   field.handleChange(value.map((o) => o.value))
@@ -157,8 +163,8 @@ export function CreateTaskForm({
               <InputErrors field={field} />
             </Label>
           )}
-        </createTaskForm.Field>
-        <createTaskForm.Field
+        </editTaskForm.Field>
+        <editTaskForm.Field
           validatorAdapter={zodValidator}
           name="tags"
           validators={{ onSubmit: tags }}
@@ -173,8 +179,8 @@ export function CreateTaskForm({
               <InputErrors field={field} />
             </Label>
           )}
-        </createTaskForm.Field>
-        <createTaskForm.Field
+        </editTaskForm.Field>
+        <editTaskForm.Field
           validatorAdapter={zodValidator}
           validators={{ onSubmit: description }}
           name="description"
@@ -190,11 +196,11 @@ export function CreateTaskForm({
               <InputErrors field={field} />
             </Label>
           )}
-        </createTaskForm.Field>
+        </editTaskForm.Field>
       </form>
       <Button form="create-board-form" className="w-fit min-w-36">
-        Crear tarea
+        Editar tarea
       </Button>
-    </createTaskForm.Provider>
+    </editTaskForm.Provider>
   )
 }

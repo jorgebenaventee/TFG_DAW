@@ -5,6 +5,7 @@ import { taskService } from '@/services/task.service'
 import { getCurrentPayload } from '@/utils/get-current-payload'
 import { getLogger } from '@/utils/get-logger'
 import { z } from 'zod'
+import { editTaskSchema } from '@/schemas/tasks/edit-task.schema'
 
 const router = new Hono()
 const logger = getLogger()
@@ -22,6 +23,25 @@ router.post('/', zValidator('json', createTaskSchema), async (c) => {
   return c.json(newTask, 201)
 })
 
+router.put('/:id', zValidator('json', editTaskSchema), async (c) => {
+  const { id: taskId } = c.req.param()
+  const { id: userId } = getCurrentPayload(c)
+  const newTask = editTaskSchema.parse(await c.req.json())
+  logger.info('Actualizando tarea', {
+    taskId,
+    userId,
+    newTask,
+  })
+
+  const updatedTask = await taskService.editTask({
+    newTask,
+    taskId,
+    userId,
+  })
+
+  return c.json(updatedTask)
+})
+
 router.put(
   '/move',
   zValidator(
@@ -33,7 +53,7 @@ router.put(
       order: z.number(),
     }),
   ),
-  async (c, next) => {
+  async (c) => {
     const { id } = getCurrentPayload(c)
     const { taskId, newColumnId, boardId, order } = await c.req.json()
 

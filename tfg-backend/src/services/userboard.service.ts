@@ -1,6 +1,6 @@
 import { getLogger } from '@/utils/get-logger'
 import { db } from '@/drizzle/db'
-import { userBoardTable } from '@/drizzle/schema'
+import { userBoardTable, userTable } from '@/drizzle/schema'
 import { and, eq } from 'drizzle-orm'
 import { HTTPException } from 'hono/http-exception'
 
@@ -41,6 +41,29 @@ async function checkPermissions({
   return userBoard.role
 }
 
+async function getUsersInBoard({
+  userId,
+  boardId,
+}: {
+  userId: string
+  boardId: string
+}) {
+  await checkPermissions({
+    userId,
+    boardId,
+  })
+  return await db
+    .select({
+      id: userTable.id,
+      username: userTable.username,
+    })
+    .from(userBoardTable)
+    .innerJoin(userTable, eq(userTable.id, userBoardTable.userId))
+    .where(eq(userBoardTable.boardId, boardId))
+    .execute()
+}
+
 export const userBoardService = {
   checkPermissions,
+  getUsersInBoard,
 }
