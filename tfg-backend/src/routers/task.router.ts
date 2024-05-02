@@ -22,26 +22,6 @@ router.post('/', zValidator('json', createTaskSchema), async (c) => {
   })
   return c.json(newTask, 201)
 })
-
-router.put('/:id', zValidator('json', editTaskSchema), async (c) => {
-  const { id: taskId } = c.req.param()
-  const { id: userId } = getCurrentPayload(c)
-  const newTask = editTaskSchema.parse(await c.req.json())
-  logger.info('Actualizando tarea', {
-    taskId,
-    userId,
-    newTask,
-  })
-
-  const updatedTask = await taskService.editTask({
-    newTask,
-    taskId,
-    userId,
-  })
-
-  return c.json(updatedTask)
-})
-
 router.put(
   '/move',
   zValidator(
@@ -68,4 +48,24 @@ router.put(
     return c.json({ message: 'Tarea movida' })
   },
 )
+
+router.put('/:id', zValidator('json', editTaskSchema), async (c) => {
+  const { id: taskId } = c.req.param()
+  const { id: userId } = getCurrentPayload(c)
+  const newTask = editTaskSchema.parse(await c.req.json())
+  logger.info('Actualizando tarea', {
+    taskId,
+    userId,
+    newTask,
+  })
+
+  const updatedTask = await taskService.editTask({
+    newTask,
+    taskId,
+    userId,
+  })
+
+  return c.json(updatedTask)
+})
+
 export default router

@@ -12,6 +12,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog.tsx'
 import { EditTaskForm } from '@/components/EditTaskForm.tsx'
+import { MoveIcon } from '@/components/icons/move-icon.tsx'
 
 export function Column({ column }: { column: ColumnType }) {
   return (
@@ -36,11 +37,13 @@ export function Column({ column }: { column: ColumnType }) {
               <Draggable draggableId={task.id} key={task.id} index={index}>
                 {(provided) => (
                   <li
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
                     className="cursor-pointer transition hover:scale-105"
                     ref={provided.innerRef}
+                    {...provided.draggableProps}
                   >
+                    <div {...provided.dragHandleProps}>
+                      <MoveIcon />
+                    </div>
                     <Dialog>
                       <DialogTrigger className="w-full">
                         <Task task={task} />
