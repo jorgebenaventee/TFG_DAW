@@ -6,6 +6,24 @@ import { Link } from '@tanstack/react-router'
 
 export function BoardList() {
   const { data = [], isLoading } = useBoards()
+  const isDeleteButtonTarget = (target: EventTarget) => {
+    if (target instanceof HTMLDivElement) {
+      return false
+    }
+    if (
+      !(target instanceof HTMLButtonElement) ||
+      !(target instanceof SVGElement)
+    ) {
+      return true
+    }
+
+    const ancestor = target.closest('[data-delete-button]')
+    if (!ancestor) {
+      return true
+    }
+
+    return false
+  }
   return (
     <>
       <h3 className="text-2xl font-semibold">Tus tableros</h3>
@@ -19,6 +37,12 @@ export function BoardList() {
                 key={board.id}
                 to="/board/$boardId"
                 params={{ boardId: board.id }}
+                onClick={(e) => {
+                  const { target } = e
+                  if (isDeleteButtonTarget(target)) {
+                    e.preventDefault()
+                  }
+                }}
               >
                 <BoardItem board={board} />
               </Link>

@@ -69,6 +69,7 @@ export function BoardItem({ board }: { board: Board }) {
         <AlertDialogTrigger asChild>
           <Button
             className="absolute right-2 top-2 hidden text-red-500 group-hover:block"
+            data-delete-button
             variant="destructive"
           >
             <TrashIcon className="text-white" />
@@ -91,6 +92,7 @@ export function BoardItem({ board }: { board: Board }) {
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive hover:bg-destructive/90"
+              data-delete-button
               onClick={() => mutate(board.id)}
             >
               Eliminar
