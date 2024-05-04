@@ -3,7 +3,7 @@ import { zValidator } from '@hono/zod-validator'
 import { getColumnsSchema } from '@/schemas/columns/get-columns.schema'
 import { getLogger } from '@/utils/get-logger'
 import { columnService } from '@/services/column.service'
-import { createColumnSchema } from '@/schemas/columns/create-column.schema'
+import { columnSchema } from '@/schemas/columns/column.schema'
 import { getCurrentPayload } from '@/utils/get-current-payload'
 
 const router = new Hono()
@@ -24,7 +24,7 @@ router.get('/', zValidator('query', getColumnsSchema), async (c) => {
   return c.json(columns)
 })
 
-router.post('/', zValidator('json', createColumnSchema), async (c) => {
+router.post('/', zValidator('json', columnSchema), async (c) => {
   const { boardId, name } = await c.req.json()
   const { id: userId } = getCurrentPayload(c)
 
@@ -46,5 +46,17 @@ router.post('/', zValidator('json', createColumnSchema), async (c) => {
   })
 
   return c.json(column)
+})
+
+router.put('/:id', zValidator('json', columnSchema), async (c) => {
+  const { boardId, name } = await c.req.json()
+  const { id: userId } = getCurrentPayload(c)
+  const { id: columnId } = c.req.param()
+
+  logger.info('Editando columna', { boardId, name, userId, columnId })
+  await columnService.editColumn({ boardId, name, userId, columnId })
+  logger.info('Columna editada', { boardId, name, userId, columnId })
+
+  c.status(200)
 })
 export default router

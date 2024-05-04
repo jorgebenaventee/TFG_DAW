@@ -13,7 +13,7 @@ import { cn, formatDate } from '@/lib/utils.ts'
 import { CalendarIcon } from 'lucide-react'
 import { Calendar } from '@/components/ui/calendar.tsx'
 import { Textarea } from '@/components/ui/textarea.tsx'
-import { useEditTaskForm } from '@/hooks/use-edit-task-form.tsx'
+import { useEditTaskForm } from '@/hooks/use-edit-task-form.ts'
 import { useUsersInBoard } from '@/hooks/use-users-in-board.ts'
 import MultipleSelector, { Option } from '@/components/ui/multiple-selector.tsx'
 

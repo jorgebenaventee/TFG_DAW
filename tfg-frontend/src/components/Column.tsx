@@ -1,6 +1,4 @@
 import { type Column as ColumnType } from '@/api/column-api.ts'
-import { DotsIcon } from '@/components/icons/dots-icon.tsx'
-import { Button } from '@/components/ui/button.tsx'
 import { CreateTaskDialog } from '@/components/CreateTaskDialog.tsx'
 import { Task } from '@/components/Task.tsx'
 import { Draggable, Droppable } from '@hello-pangea/dnd'
@@ -13,6 +11,7 @@ import {
 } from '@/components/ui/dialog.tsx'
 import { EditTaskForm } from '@/components/EditTaskForm.tsx'
 import { MoveIcon } from '@/components/icons/move-icon.tsx'
+import { EditColumnButton } from './EditColumnButton'
 
 export function Column({ column }: { column: ColumnType }) {
   return (
@@ -25,9 +24,7 @@ export function Column({ column }: { column: ColumnType }) {
         >
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold">{column.name}</h3>
-            <Button variant="ghost">
-              <DotsIcon />
-            </Button>
+            <EditColumnButton column={column} />
           </div>
           <div>
             <CreateTaskDialog boardId={column.boardId} columnId={column.id} />

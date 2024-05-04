@@ -8,6 +8,7 @@ import {
 } from '@/drizzle/schema'
 import { getLogger } from '@/utils/get-logger'
 import { userBoardService } from '@/services/userboard.service'
+import { and, eq } from 'drizzle-orm'
 
 const logger = getLogger()
 
@@ -106,6 +107,40 @@ async function createColumn({
     .execute()
 }
 
+async function editColumn({
+  userId,
+  boardId,
+  name,
+  columnId,
+}: {
+  userId: string
+  boardId: string
+  name: string
+  columnId: string
+}) {
+  logger.info('Editando columna', { userId, boardId, columnId, newName: name })
+  const isAdmin = await hasAdminPermissions({ userId, boardId })
+  if (!isAdmin) {
+    logger.error('No tienes permiso para editar columnas en este tablero', {
+      userId,
+      boardId,
+    })
+    throw new HTTPException(403, {
+      message: 'No tienes permiso para editar columnas en este tablero',
+    })
+  }
+
+  const updatedRows = await db
+    .update(columnTable)
+    .set({ name })
+    .where(and(eq(columnTable.id, columnId), eq(columnTable.boardId, boardId)))
+    .returning({ updatedName: columnTable.id })
+
+  if (updatedRows.length === 0) {
+    throw new HTTPException(404, { message: 'No se ha encontrado la columna' })
+  }
+}
+
 async function hasAdminPermissions({
   userId,
   boardId,
@@ -137,4 +172,5 @@ async function checkPermissions({
 export const columnService = {
   getColumns,
   createColumn,
+  editColumn,
 }
