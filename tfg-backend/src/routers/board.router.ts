@@ -4,6 +4,7 @@ import { zValidator } from '@hono/zod-validator'
 import { createBoardSchema } from '@/schemas/boards/create-board.schema'
 import { boardService } from '@/services/board.service'
 import { getLogger } from '@/utils/get-logger'
+import { z } from 'zod'
 
 const router = new Hono()
 const logger = getLogger()
@@ -14,6 +15,18 @@ router.get('/', async (c) => {
 
   return c.json(boards)
 })
+
+router.get(
+  '/:id',
+  zValidator('param', z.object({ id: z.string().uuid() })),
+  async (c) => {
+    const boardId = c.req.param('id')
+    logger.info('Obteniendo tablero', { boardId })
+    const { id: userId } = getCurrentPayload(c)
+    const board = await boardService.getBoard({ userId, boardId })
+    return c.json(board)
+  },
+)
 
 router.get('/:id/image', async (c) => {
   const boardId = c.req.param('id')

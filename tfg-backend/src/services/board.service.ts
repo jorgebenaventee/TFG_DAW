@@ -9,6 +9,19 @@ import { getLogger } from '@/utils/get-logger'
 
 const logger = getLogger()
 
+function mapBoard(board: Board) {
+  if (board.image != null) {
+    const image = path.basename(board.image)
+    const hyphenIndex = image.indexOf('-')
+    const name = image.slice(hyphenIndex + 1)
+    return {
+      ...board,
+      image: name,
+    }
+  }
+  return board
+}
+
 async function getBoards({ userId }: { userId: string }) {
   logger.info('Obteniendo tableros', { userId })
   const userBoards = await db.query.userBoardTable.findMany({
@@ -29,18 +42,36 @@ async function getBoards({ userId }: { userId: string }) {
     userId,
     boards: boards.length,
   })
-  return boards.map((board) => {
-    if (board.image != null) {
-      const image = path.basename(board.image)
-      const hyphenIndex = image.indexOf('-')
-      const name = image.slice(hyphenIndex + 1)
-      return {
-        ...board,
-        image: name,
-      }
-    }
-    return board
+  return boards.map(mapBoard)
+}
+async function getBoard({
+  userId,
+  boardId,
+}: {
+  userId: string
+  boardId: string
+}) {
+  logger.info('Obteniendo tablero', { userId, boardId })
+  const userBoard = await db.query.userBoardTable.findFirst({
+    where: (userBoard, { eq, and }) =>
+      and(eq(userBoard.userId, userId), eq(userBoard.boardId, boardId)),
+    columns: {
+      boardId: true,
+    },
   })
+
+  if (!userBoard) {
+    logger.error('El usuario no pertenece al tablero', { userId, boardId })
+    throw new HTTPException(403, {
+      message: 'No tienes permiso para ver este tablero',
+    })
+  }
+
+  const board = (await db.query.boardTable.findFirst({
+    where: (board, { eq }) => eq(board.id, boardId),
+  }))!
+
+  return mapBoard(board)
 }
 
 async function getBoardImage({ boardId }: { boardId: string }) {
@@ -166,6 +197,7 @@ async function deleteBoard({
 export const boardService = {
   createBoard,
   getBoards,
+  getBoard,
   getBoardImage,
   deleteBoard,
 }
