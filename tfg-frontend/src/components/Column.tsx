@@ -23,7 +23,9 @@ export function Column({ column }: { column: ColumnType }) {
           ref={provided.innerRef}
         >
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold">{column.name}</h3>
+            <h3 className="truncate text-lg font-semibold" title={column.name}>
+              {column.name}
+            </h3>
             <EditColumnButton column={column} />
           </div>
           <div>
