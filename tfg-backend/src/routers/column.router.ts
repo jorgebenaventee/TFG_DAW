@@ -57,6 +57,6 @@ router.put('/:id', zValidator('json', columnSchema), async (c) => {
   await columnService.editColumn({ boardId, name, userId, columnId })
   logger.info('Columna editada', { boardId, name, userId, columnId })
 
-  c.status(200)
+  return new Response(null, { status: 200 })
 })
 export default router
