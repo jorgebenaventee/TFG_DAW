@@ -11,8 +11,13 @@ export function Task({ task }: { task: TaskType }) {
   const isEndDateBeforeToday =
     (task.endDate && new Date(task.endDate) < new Date()) ?? false
   return (
-    <Card className={cn(isEndDateBeforeToday && 'bg-red-900')}>
-      <CardHeader>
+    <Card
+      className={cn(
+        isEndDateBeforeToday && 'bg-red-900',
+        'flex-column flex h-full min-h-28 justify-center items-center',
+      )}
+    >
+      <CardHeader className="flex-column flex h-full items-center justify-center">
         <CardTitle className="text-lg">{task.name}</CardTitle>
         {task.description && (
           <CardDescription
