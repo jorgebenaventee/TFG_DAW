@@ -14,7 +14,7 @@ export function Task({ task }: { task: TaskType }) {
     <Card
       className={cn(
         isEndDateBeforeToday && 'bg-red-900',
-        'flex-column flex h-full min-h-28 justify-center items-center',
+        'flex-column flex h-full min-h-28 items-center justify-center',
       )}
     >
       <CardHeader className="flex-column flex h-full items-center justify-center">
