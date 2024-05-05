@@ -14,29 +14,33 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu'
+import { EditColumnForm } from './EditColumnForm'
+import { useState } from 'react'
 
 export function EditColumnButton({ column }: { column: Column }) {
+  const [open, setOpen] = useState(false)
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost">
-          <DotsIcon />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="cursor-pointer">
-        <DropdownMenuItem>
-          <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost">
+            <DotsIcon />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="cursor-pointer">
+          <DropdownMenuItem>
             <DialogTrigger asChild>
               <Button variant="ghost">Editar</Button>
             </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Editar columna</DialogTitle>
-              </DialogHeader>
-            </DialogContent>
-          </Dialog>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar columna</DialogTitle>
+          </DialogHeader>
+          <EditColumnForm column={column} onSubmit={() => setOpen(false)} />
+        </DialogContent>
+      </DropdownMenu>
+    </Dialog>
   )
 }

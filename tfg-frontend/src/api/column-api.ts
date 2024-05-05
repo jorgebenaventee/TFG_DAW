@@ -27,7 +27,15 @@ function createColumn(data: z.infer<typeof createColumnSchema>) {
   })
 }
 
+function editColumn(id: Column['id'], data: { name: string; boardId: string }) {
+  return apiFetch(`/column/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  })
+}
+
 export const columnApi = {
   getColumns,
   createColumn,
+  editColumn,
 }
