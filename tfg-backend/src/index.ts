@@ -13,6 +13,7 @@ import columnRouter from '@/routers/column.router'
 import { getLogger } from '@/utils/get-logger'
 import taskRouter from '@/routers/task.router'
 import userboardRouter from '@/routers/userboard.router'
+import tagRouter from './routers/tag.router'
 
 configDotenv()
 
@@ -48,6 +49,7 @@ app.route('/board', boardRouter)
 app.route('/column', columnRouter)
 app.route('/task', taskRouter)
 app.route('/userboard', userboardRouter)
+app.route('/tag', tagRouter)
 app.onError((e, { req }) => {
   const { method, url } = req
   log.error(e, 'Error in request', {
