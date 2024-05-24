@@ -7,7 +7,7 @@ export const columnSchema = z.object({
   boardId: z.string().uuid(),
   name: z.string(),
   order: z.number(),
-  tasks: z.array(taskSchema).optional(),
+  tasks: z.array(taskSchema).min(0).optional(),
 })
 
 const createColumnSchema = columnSchema.omit({ order: true, id: true })

@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { apiFetch } from '@/utils/api-fetch.ts'
+import { tagSchema } from '@/api/tag-api.ts'
 
 export const createTaskSchema = z.object({
   name: z
@@ -24,7 +25,7 @@ export const taskSchema = z.object({
   columnId: z.string().uuid(),
   hasImage: z.boolean().default(false),
   assignedTo: z.array(z.string().uuid()).optional(),
-  tags: z.array(z.string().uuid()).optional(),
+  tags: z.array(tagSchema).optional(),
 })
 
 export const editTaskSchema = z.object({

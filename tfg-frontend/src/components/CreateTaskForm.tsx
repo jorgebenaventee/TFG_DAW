@@ -12,6 +12,7 @@ import { cn, formatDate } from '@/lib/utils.ts'
 import { Textarea } from '@/components/ui/textarea.tsx'
 import { useUsersInBoard } from '@/hooks/use-users-in-board.ts'
 import MultipleSelector, { Option } from '@/components/ui/multiple-selector.tsx'
+import { useTagsInBoard } from '@/hooks/useTagsInBoard.ts'
 
 export function CreateTaskForm({
   boardId,
@@ -22,12 +23,20 @@ export function CreateTaskForm({
 }) {
   const { createTaskForm } = useCreateTaskForm({ boardId, columnId })
   const { data: users, isLoading: usersLoading } = useUsersInBoard({ boardId })
+  const { data: boardTags = [], isLoading: tagsLoading } = useTagsInBoard({
+    boardId,
+  })
   const { name, startDate, endDate, description, assignedTo, tags } =
     createTaskSchema.shape
   const userOptions: Option[] =
     users?.map((user) => ({
       label: user.username,
       value: user.id,
+    })) ?? []
+  const tagsOptions: Option[] =
+    boardTags?.map((tag) => ({
+      label: tag.name,
+      value: tag.id!,
     })) ?? []
   return (
     <createTaskForm.Provider>
@@ -165,11 +174,18 @@ export function CreateTaskForm({
         >
           {(field) => (
             <Label className="flex flex-col gap-2">
-              Etiquetas{/* <MultipleSelector */}
-              {/*  value={field.state.value} */}
-              {/*  onChange={(value) => field.handleChange(value)} */}
-              {/* /> */}
-              <Input value={field.state.value} />
+              Etiquetas
+              <MultipleSelector
+                options={tagsOptions}
+                disabled={tagsLoading}
+                value={field.state.value?.map((s) => ({
+                  value: s,
+                  label: boardTags.find((t) => t.id === s)?.name ?? '',
+                }))}
+                onChange={(value) =>
+                  field.handleChange(value.map((o) => o.value))
+                }
+              />
               <InputErrors field={field} />
             </Label>
           )}

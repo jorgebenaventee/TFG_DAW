@@ -2,6 +2,7 @@ import { db } from '@/drizzle/db'
 import { HTTPException } from 'hono/http-exception'
 import {
   columnTable,
+  Tag,
   taskTable,
   type TaskTag,
   type UserTask,
@@ -39,6 +40,17 @@ async function getColumns({
       },
     },
   })
+  const tagIds = new Set<Tag['id']>()
+  columns.forEach((column) => {
+    column.tasks.forEach((task) => {
+      task.taskTags.forEach((taskTag: TaskTag) => {
+        tagIds.add(taskTag.tagId)
+      })
+    })
+  })
+  const tags = await db.query.tagTable.findMany({
+    where: (tags, { inArray }) => inArray(tags.id, Array.from(tagIds)),
+  })
   return columns.map((column) => {
     return {
       ...column,
@@ -49,7 +61,9 @@ async function getColumns({
             assignedTo: task.userTasks.map(
               (userTask: UserTask) => userTask.userId,
             ),
-            tags: task.taskTags.map((taskTag: TaskTag) => taskTag.tagId),
+            tags: task.taskTags.map((taskTag: TaskTag) =>
+              tags.find((tag) => tag.id === taskTag.tagId),
+            ),
           }
         })
         // @ts-expect-error Somehow typescript does not infer this correctly
