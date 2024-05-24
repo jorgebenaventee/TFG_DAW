@@ -1,5 +1,4 @@
-import { boardApi } from '@/api/board-api'
-import { Link, Outlet, createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute, Link, Outlet } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticated/board/$boardId/settings')(
   {

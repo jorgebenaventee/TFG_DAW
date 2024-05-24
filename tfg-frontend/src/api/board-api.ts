@@ -64,6 +64,7 @@ function removeUserFromBoard(body: { boardId: string; userId: string }) {
     responseIsJson: false,
   })
 }
+
 function createBoard(data: Omit<Board, 'id'>) {
   const formData = new FormData()
   formData.append('name', data.name)

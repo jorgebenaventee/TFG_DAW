@@ -15,7 +15,7 @@ router.get(
   async (c) => {
     const { id: userId } = getCurrentPayload(c)
     const boardId = c.req.query().boardId
-    const tag = tagService.getTagsInBoard({
+    const tag = await tagService.getTagsInBoard({
       userId,
       boardId,
     })
@@ -45,12 +45,12 @@ router.post('/', zValidator('json', tagMutationSchema), async (c) => {
 })
 
 router.put(
-  '/:id',
+  '/:tagId',
   zValidator('param', z.object({ tagId: z.string().uuid() })),
   zValidator('json', tagMutationSchema),
   async (c) => {
     const { id: userId } = getCurrentPayload(c)
-    const tagId = c.req.param('id')
+    const tagId = c.req.param('tagId')
     const tag = await c.req.json()
     logger.info('Actualizando etiqueta', { userId, tagId, tag })
     const updatedTag = await tagService.updateTag({ userId, tag })
@@ -65,7 +65,7 @@ router.delete('/:id', async (c) => {
   logger.info('Borrando etiqueta', { userId, tagId })
   await tagService.deleteTag({ userId, tagId })
   logger.info('Etiqueta borrada', { userId, tagId })
-  return c.status(204)
+  return new Response(null, { status: 204 })
 })
 
 export default router

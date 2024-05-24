@@ -6,6 +6,7 @@ import { Tag, tagTable, taskTagTable } from '@/drizzle/schema'
 import { eq } from 'drizzle-orm'
 
 const logger = getLogger()
+
 async function checkPermissions({
   userId,
   boardId,

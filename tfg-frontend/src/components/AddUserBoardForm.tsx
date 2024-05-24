@@ -6,12 +6,12 @@ import { zodValidator } from '@tanstack/zod-form-adapter'
 import { z } from 'zod'
 import { useAddUserBoardForm } from '@/hooks/use-add-user-board'
 import {
-  SelectValue,
-  SelectGroup,
   Select,
   SelectContent,
-  SelectTrigger,
+  SelectGroup,
   SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select'
 
 export function AddUserBoardForm({

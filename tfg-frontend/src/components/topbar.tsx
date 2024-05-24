@@ -3,8 +3,8 @@ import { Separator } from './ui/separator'
 import { ThemeSwitcher } from '@/components/theme/theme-switcher.tsx'
 import {
   NavigationMenu,
-  NavigationMenuList,
   NavigationMenuItem,
+  NavigationMenuList,
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu'
 

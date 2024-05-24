@@ -44,6 +44,7 @@ async function getBoards({ userId }: { userId: string }) {
   })
   return boards.map(mapBoard)
 }
+
 async function getBoard({
   userId,
   boardId,

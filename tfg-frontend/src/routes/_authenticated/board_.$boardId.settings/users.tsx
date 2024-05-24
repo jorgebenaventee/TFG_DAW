@@ -1,4 +1,4 @@
-import { User, boardApi } from '@/api/board-api'
+import { boardApi, User } from '@/api/board-api'
 import { ColumnDef } from '@tanstack/react-table'
 import { ToastAction } from '@/components/ui/toast'
 import { useToast } from '@/components/ui/use-toast'
@@ -8,12 +8,12 @@ import { DataTable } from '@/components/ui/datatable'
 import { Button } from '@/components/ui/button'
 import {
   Popover,
-  PopoverTrigger,
   PopoverContent,
+  PopoverTrigger,
 } from '@/components/ui/popover'
 import { AddUserBoardForm } from '@/components/AddUserBoardForm'
 import { useRemoveUserBoard } from '@/hooks/use-remove-user-board'
-import { DialogTitle } from '@/components/ui/dialog'
+
 export const Route = createFileRoute(
   '/_authenticated/board/$boardId/settings/users',
 )({
@@ -57,7 +57,7 @@ function Users() {
             </PopoverTrigger>
             <PopoverContent>
               <p className="font-semibold">¿Estás seguro?</p>
-              <div className="flex gap-2 mt-2">
+              <div className="mt-2 flex gap-2">
                 <Button
                   variant="destructive"
                   onClick={() =>

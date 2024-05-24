@@ -3,6 +3,7 @@ import { Client } from 'pg'
 import * as process from 'process'
 import { drizzle } from 'drizzle-orm/node-postgres'
 import * as schema from './schema'
+
 const {
   POSTGRES_USER,
   POSTGRES_PASSWORD,
