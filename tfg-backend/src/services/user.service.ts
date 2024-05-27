@@ -1,11 +1,11 @@
 import { HTTPException } from 'hono/http-exception'
-import { compare } from 'bcrypt'
+import { compare, hash } from 'bcrypt'
 import * as process from 'process'
 import { SignJWT } from 'jose'
 import { type LoginRequest } from '@/schemas/auth/loginRequest'
 import { getLogger } from '@/utils/get-logger'
 import { db } from '@/drizzle/db'
-import { type User } from '@/drizzle/schema'
+import { type User, userTable } from '@/drizzle/schema'
 
 const logger = getLogger()
 
@@ -34,6 +34,35 @@ async function login({ username, password }: LoginRequest) {
   return { token }
 }
 
+async function register({ username, password }: LoginRequest) {
+  logger.info('Register attempt %o', { username })
+  const dbUser = await db.query.userTable.findFirst({
+    where: (user, { eq }) => eq(user.username, username),
+  })
+  if (dbUser != null) {
+    logger.error('User already exists %o', { username })
+    throw new HTTPException(409, {
+      message: 'El usuario ya existe',
+    })
+  }
+
+  const hashedPassword = await hash(password, 10)
+  const [user] = await db
+    .insert(userTable)
+    .values([
+      {
+        username,
+        password: hashedPassword,
+      },
+    ])
+    .returning()
+    .execute()
+  logger.info('Register successful %o', { username })
+  const token = await generateToken(user)
+
+  return { token }
+}
+
 async function generateToken(user: User) {
   const secret = new TextEncoder().encode(process.env.JWT_SECRET)
   const alg = 'HS512'
@@ -53,4 +82,5 @@ async function generateToken(user: User) {
 
 export const userService = {
   login,
+  register,
 }

@@ -31,6 +31,10 @@ async function getBoards({ userId }: { userId: string }) {
     },
   })
 
+  if (userBoards.length === 0) {
+    return []
+  }
+
   const boards = await db.query.boardTable.findMany({
     where: (board, { inArray }) =>
       inArray(
