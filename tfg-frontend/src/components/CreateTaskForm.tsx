@@ -13,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea.tsx'
 import { useUsersInBoard } from '@/hooks/use-users-in-board.ts'
 import MultipleSelector, { Option } from '@/components/ui/multiple-selector.tsx'
 import { useTagsInBoard } from '@/hooks/useTagsInBoard.ts'
+import { useGenerateDescription } from '@/hooks/use-generate-description.ts'
 
 export function CreateTaskForm({
   boardId,
@@ -22,6 +23,11 @@ export function CreateTaskForm({
   columnId: string
 }) {
   const { createTaskForm } = useCreateTaskForm({ boardId, columnId })
+  const {
+    mutate: generateDescription,
+    data,
+    isPending,
+  } = useGenerateDescription()
   const { data: users, isLoading: usersLoading } = useUsersInBoard({ boardId })
   const { data: boardTags = [], isLoading: tagsLoading } = useTagsInBoard({
     boardId,
@@ -38,6 +44,13 @@ export function CreateTaskForm({
       label: tag.name,
       value: tag.id!,
     })) ?? []
+  const doGenerateDescription = async () => {
+    generateDescription(createTaskForm.getFieldValue('name'))
+  }
+
+  if (data) {
+    createTaskForm.setFieldValue('description', data.description)
+  }
   return (
     <createTaskForm.Provider>
       <form
@@ -197,7 +210,18 @@ export function CreateTaskForm({
         >
           {(field) => (
             <Label className="col-span-4 flex flex-col gap-2">
-              Descripción
+              <div className="flex items-end justify-between">
+                <span>Descripción</span>
+                <Button
+                  variant="ghost"
+                  type="button"
+                  onClick={doGenerateDescription}
+                  className="m-0 items-end p-0 text-xs hover:bg-transparent"
+                  disabled={isPending}
+                >
+                  Generar descripción
+                </Button>
+              </div>
               <Textarea
                 value={field.state.value}
                 onBlur={field.handleBlur}
