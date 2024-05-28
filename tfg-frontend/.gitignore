@@ -25,3 +25,4 @@ dist-ssr
 /src/routeTree.gen.ts
 /.env
 /.vite/
+/.env.production

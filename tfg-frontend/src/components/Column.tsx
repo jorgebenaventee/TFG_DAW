@@ -53,7 +53,11 @@ export function Column({ column }: { column: ColumnType }) {
                         </DialogHeader>
                         <EditTaskForm
                           boardId={column.boardId}
-                          task={{ ...task, boardId: column.boardId }}
+                          task={{
+                            ...task,
+                            boardId: column.boardId,
+                            tags: task.tags?.map((tag) => tag.id!),
+                          }}
                         />
                       </DialogContent>
                     </Dialog>
