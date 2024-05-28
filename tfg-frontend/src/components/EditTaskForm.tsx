@@ -1,4 +1,4 @@
-import { createTaskSchema, EditTask } from '@/api/task-api.ts'
+import { createTaskSchema, EditTask, Task } from '@/api/task-api.ts'
 import { zodValidator } from '@tanstack/zod-form-adapter'
 import { Label } from '@/components/ui/label.tsx'
 import { Input } from '@/components/ui/input.tsx'
@@ -17,6 +17,7 @@ import { useEditTaskForm } from '@/hooks/use-edit-task-form.ts'
 import { useUsersInBoard } from '@/hooks/use-users-in-board.ts'
 import MultipleSelector, { Option } from '@/components/ui/multiple-selector.tsx'
 import { useTagsInBoard } from '@/hooks/useTagsInBoard.ts'
+import { useGenerateDescription } from '@/hooks/use-generate-description.ts'
 
 export function EditTaskForm({
   boardId,
@@ -25,7 +26,15 @@ export function EditTaskForm({
   boardId: string
   task: EditTask
 }) {
-  const { editTaskForm } = useEditTaskForm({ boardId, task })
+  const { editTaskForm } = useEditTaskForm({
+    boardId,
+    task: task as unknown as Task,
+  })
+  const {
+    mutate: generateDescription,
+    data,
+    isPending,
+  } = useGenerateDescription()
   const { data: users = [], isLoading: usersLoading } = useUsersInBoard({
     boardId,
   })
@@ -44,6 +53,14 @@ export function EditTaskForm({
       label: tag.name,
       value: tag.id!,
     })) ?? []
+
+  const doGenerateDescription = async () => {
+    generateDescription(editTaskForm.getFieldValue('name'))
+  }
+
+  if (data) {
+    editTaskForm.setFieldValue('description', data.description)
+  }
   return (
     <editTaskForm.Provider>
       <form
@@ -203,7 +220,18 @@ export function EditTaskForm({
         >
           {(field) => (
             <Label className="col-span-4 flex flex-col gap-2">
-              Descripción
+              <div className="flex items-end justify-between">
+                <span>Descripción</span>
+                <Button
+                  variant="ghost"
+                  type="button"
+                  onClick={doGenerateDescription}
+                  className="m-0 items-end p-0 text-xs hover:bg-transparent"
+                  disabled={isPending}
+                >
+                  Generar descripción
+                </Button>
+              </div>
               <Textarea
                 value={field.state.value}
                 onBlur={field.handleBlur}

@@ -68,4 +68,22 @@ router.put('/:id', zValidator('json', editTaskSchema), async (c) => {
   return c.json(updatedTask)
 })
 
+router.get(
+  '/ai/description',
+  zValidator('query', z.object({ title: z.string().min(1) })),
+  async (c) => {
+    const title = c.req.query('title')
+    if (!title) {
+      return new Response(
+        JSON.stringify({
+          error: 'El título es obligatorio para poder generar la descripción',
+        }),
+        { status: 400 },
+      )
+    }
+    const descriptionAI = await taskService.generateDescription({ title })
+    return c.json({ description: descriptionAI })
+  },
+)
+
 export default router

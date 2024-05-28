@@ -11,8 +11,13 @@ import { userBoardService } from '@/services/userboard.service'
 import { getLogger } from '@/utils/get-logger'
 import { eq } from 'drizzle-orm'
 import { type EditTask } from '@/schemas/tasks/edit-task.schema'
+import OpenAI from 'openai'
+import * as process from 'node:process'
 
 const logger = getLogger()
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_KEY,
+})
 
 async function createTask({
   userId,
@@ -375,8 +380,56 @@ async function insertTaskTags({
   logger.info('Se asignaron las etiquetas a la tarea')
 }
 
+async function generateDescription({ title }: { title: string }) {
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-3.5-turbo',
+    messages: [
+      {
+        role: 'system',
+        content:
+          'You are a helpful assistant that is helping a user write a description for a task. The user only understands Spanish. You need to provide requirements to complete the task, as well as any other relevant information. The user will provide the title of the task. Do not provide a detailed step-by-step guide on how to complete the task.',
+      },
+      {
+        role: 'user',
+        content: 'Organigrama de la empresa',
+      },
+      {
+        role: 'assistant',
+        content: `Se requiere crear un organigrama con las siguientes características:
+                    Deberemos de poder añadir los siguientes datos:
+
+            Nombre
+            Apellidos
+            Cargo
+            Departamento
+            Cuando hagas click en un nodo, deberemos de mostrar la siguiente información:
+
+            Email corporativo
+            Teléfono
+            Lugar físico de trabajo (Campus asociado)
+            En el formulario de alta o edición (en otra pantalla) debemos de poder dar de alta o editar toda la información anterior. Además debe de aparecer un botón para el borrado, con un modal de confirmación (el borrado siempre será lógico).
+
+            Al hacer click en el nodo debe de aparecer en un modal la información de contacto (email, teléfono, lugar físico de trabajo).
+
+            Debemos de contar con un buscador para poder buscar un usuario, y que aparezcan 3 niveles de relaciones, 1 por arriba y dos por debajo (ver en reunión).
+
+            Debemos de poder añadir de forma sencilla un rol, asociado a unos permisos, a un usuario. Se plantea añadir un submenú en la sección de "organigrama del sidebar", para que haciendo click te redirija a una pantalla con una tabla con filtros y buscador, en la que aparezca un usuario en cada fila con sus roles / permisos asociados (Quizás tengamos que usar tablas anidadas [misma tabla] usando Primeng, utilizando la función Row Expand: https://primeng.org/table#row-expand  Row Group  https://primeng.org/table#row-group  ) para que aparezca un usuario con todos sus permisos asociados (tendrá varios). 
+
+            A tener en cuenta que a futuro el SIS podrá gestionar los accesos a otras herramientas de la institución (esto en versiones posteriores), por el momento debemos de trabajar en el perfilado relativo a las acciones permitidas o no, en función de la definición de cada rol.`,
+      },
+      {
+        role: 'user',
+        content: title,
+      },
+    ],
+  })
+
+  return completion.choices[0].message.content
+}
+
 export const taskService = {
   createTask,
   moveTask,
   editTask,
+  generateDescription,
 }

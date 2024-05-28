@@ -24,6 +24,7 @@ const envVariables = z.object({
   POSTGRES_DB: z.string(),
   POSTGRES_HOST: z.string(),
   POSTGRES_PORT: z.string(),
+  OPENAI_KEY: z.string(),
 })
 
 envVariables.parse(process.env)

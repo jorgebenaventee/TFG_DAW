@@ -1,7 +1,6 @@
 import { Task as TaskType } from '@/api/task-api.ts'
 import {
   Card,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -26,16 +25,6 @@ export function Task({ task }: { task: TaskType }) {
     >
       <CardHeader className="flex h-full flex-col items-center justify-center">
         <CardTitle className="text-lg">{task.name}</CardTitle>
-        {task.description && (
-          <CardDescription
-            className={cn(
-              'truncate',
-              isEndDateBeforeToday && 'text-neutral-300',
-            )}
-          >
-            {task.description}
-          </CardDescription>
-        )}
       </CardHeader>
       <CardFooter className="flex w-full items-end justify-end">
         {task.tags && (
