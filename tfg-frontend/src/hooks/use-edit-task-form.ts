@@ -1,14 +1,14 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useToast } from '@/components/ui/use-toast.ts'
 import { createFormFactory } from '@tanstack/react-form'
-import { EditTask, Task, taskApi } from '@/api/task-api.ts'
+import { EditTask, taskApi } from '@/api/task-api.ts'
 import { QUERY_KEYS } from '@/constants/query.constants.ts'
 
 export function useEditTaskForm({
   task,
   boardId,
 }: {
-  task: Task
+  task: EditTask
   boardId: string
 }) {
   const queryClient = useQueryClient()
@@ -16,7 +16,7 @@ export function useEditTaskForm({
   const formFactory = createFormFactory<EditTask>({
     defaultValues: {
       ...task,
-      tags: task.tags?.map((tag) => tag.id!) ?? [],
+      tags: task.tags?.map((tag) => tag!) ?? [],
       boardId,
     },
   })

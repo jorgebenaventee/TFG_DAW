@@ -87,6 +87,7 @@ async function editTask({
   taskId: string
   newTask: EditTask
 }) {
+  console.log('HOLA', taskId)
   const task = await db.query.taskTable.findFirst({
     where: (task, { eq }) => eq(task.id, taskId),
   })

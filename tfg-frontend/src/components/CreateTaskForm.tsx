@@ -14,6 +14,7 @@ import { useUsersInBoard } from '@/hooks/use-users-in-board.ts'
 import MultipleSelector, { Option } from '@/components/ui/multiple-selector.tsx'
 import { useTagsInBoard } from '@/hooks/useTagsInBoard.ts'
 import { useGenerateDescription } from '@/hooks/use-generate-description.ts'
+import React, { useRef } from 'react'
 
 export function CreateTaskForm({
   boardId,
@@ -39,12 +40,18 @@ export function CreateTaskForm({
       label: user.username,
       value: user.id,
     })) ?? []
+  const generateDescriptionButtonRef = useRef<HTMLButtonElement>(null)
   const tagsOptions: Option[] =
     boardTags?.map((tag) => ({
       label: tag.name,
       value: tag.id!,
     })) ?? []
-  const doGenerateDescription = async () => {
+  const doGenerateDescription = async (
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    if (event.target !== generateDescriptionButtonRef.current) {
+      return
+    }
     generateDescription(createTaskForm.getFieldValue('name'))
   }
 
@@ -210,13 +217,27 @@ export function CreateTaskForm({
         >
           {(field) => (
             <Label className="col-span-4 flex flex-col gap-2">
-              <div className="flex items-end justify-between">
-                <span>Descripción</span>
+              <div
+                className="flex items-end justify-between"
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                }}
+              >
+                <span
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                  }}
+                >
+                  Descripción
+                </span>
                 <Button
                   variant="ghost"
                   type="button"
-                  onClick={doGenerateDescription}
-                  className="m-0 items-end p-0 text-xs hover:bg-transparent"
+                  ref={generateDescriptionButtonRef}
+                  onClick={(event) => doGenerateDescription(event)}
+                  className="m-0 w-fit cursor-pointer items-end p-0 text-xs hover:bg-transparent"
                   disabled={isPending}
                 >
                   Generar descripción

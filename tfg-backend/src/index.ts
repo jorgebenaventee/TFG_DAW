@@ -1,11 +1,10 @@
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
-import { configDotenv } from 'dotenv'
+import { config } from 'dotenv'
 import loginRouter from '@/routers/login.router'
 import { z } from 'zod'
 import { HTTPException } from 'hono/http-exception'
 import { cors } from 'hono/cors'
-import { jwt } from 'hono/jwt'
 import { logger } from 'hono/logger'
 import { client } from '@/drizzle/db'
 import boardRouter from '@/routers/board.router'
@@ -15,7 +14,11 @@ import taskRouter from '@/routers/task.router'
 import userboardRouter from '@/routers/userboard.router'
 import tagRouter from './routers/tag.router'
 
-configDotenv()
+if (process.env.NODE_ENV !== 'test') {
+  config()
+} else {
+  config({ path: './.env.test' })
+}
 
 const envVariables = z.object({
   JWT_SECRET: z.string(),
@@ -34,18 +37,12 @@ declare global {
     interface ProcessEnv extends z.infer<typeof envVariables> {}
   }
 }
+
 const log = getLogger()
-const app = new Hono().basePath('/api')
+export const app = new Hono().basePath('/api')
 app.use('*', cors())
 app.use(logger())
 app.route('/auth', loginRouter)
-app.use(
-  '*',
-  jwt({
-    secret: process.env.JWT_SECRET,
-    alg: 'HS512',
-  }),
-)
 app.route('/board', boardRouter)
 app.route('/column', columnRouter)
 app.route('/task', taskRouter)

@@ -3,8 +3,10 @@ import { getCurrentPayload } from '@/utils/get-current-payload'
 import { userBoardService } from '@/services/userboard.service'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
+import { registerJwt } from '@/utils/register-jwt'
 
 const router = new Hono()
+router.use('*', registerJwt())
 
 router.get('/:boardId/users', async (c) => {
   const { id } = getCurrentPayload(c)

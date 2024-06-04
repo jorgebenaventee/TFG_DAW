@@ -6,8 +6,10 @@ import { getCurrentPayload } from '@/utils/get-current-payload'
 import { getLogger } from '@/utils/get-logger'
 import { z } from 'zod'
 import { editTaskSchema } from '@/schemas/tasks/edit-task.schema'
+import { registerJwt } from '@/utils/register-jwt'
 
 const router = new Hono()
+router.use('*', registerJwt())
 const logger = getLogger()
 router.post('/', zValidator('json', createTaskSchema), async (c) => {
   const task = createTaskSchema.parse(await c.req.json())
@@ -27,10 +29,16 @@ router.put(
   zValidator(
     'json',
     z.object({
-      taskId: z.string().uuid(),
-      newColumnId: z.string().uuid(),
-      boardId: z.string().uuid(),
-      order: z.number(),
+      taskId: z
+        .string({ required_error: 'El campo taskId es requerido' })
+        .uuid(),
+      newColumnId: z
+        .string({ required_error: 'El campo newColumnId es requerido' })
+        .uuid(),
+      boardId: z
+        .string({ required_error: 'El campo boardId es requerido' })
+        .uuid(),
+      order: z.number({ required_error: 'El campo order es requerido' }),
     }),
   ),
   async (c) => {

@@ -5,8 +5,10 @@ import { getLogger } from '@/utils/get-logger'
 import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { z } from 'zod'
+import { registerJwt } from '@/utils/register-jwt'
 
 const router = new Hono()
+router.use('*', registerJwt())
 const logger = getLogger()
 
 router.get(

@@ -48,9 +48,13 @@ async function getColumns({
       })
     })
   })
-  const tags = await db.query.tagTable.findMany({
-    where: (tags, { inArray }) => inArray(tags.id, Array.from(tagIds)),
-  })
+  const columnTagsId = Array.from(tagIds)
+  let tags: Tag[] = []
+  if (columnTagsId.length > 0) {
+    tags = await db.query.tagTable.findMany({
+      where: (tags, { inArray }) => inArray(tags.id, [...tagIds]),
+    })
+  }
   return columns.map((column) => {
     return {
       ...column,

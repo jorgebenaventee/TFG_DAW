@@ -5,8 +5,10 @@ import { getLogger } from '@/utils/get-logger'
 import { columnService } from '@/services/column.service'
 import { columnSchema } from '@/schemas/columns/column.schema'
 import { getCurrentPayload } from '@/utils/get-current-payload'
+import { registerJwt } from '@/utils/register-jwt'
 
 const router = new Hono()
+router.use('*', registerJwt())
 const logger = getLogger()
 router.get('/', zValidator('query', getColumnsSchema), async (c) => {
   const { boardId } = c.req.query()

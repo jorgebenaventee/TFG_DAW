@@ -5,8 +5,10 @@ import { createBoardSchema } from '@/schemas/boards/create-board.schema'
 import { boardService } from '@/services/board.service'
 import { getLogger } from '@/utils/get-logger'
 import { z } from 'zod'
+import { registerJwt } from '@/utils/register-jwt'
 
 const router = new Hono()
+router.use('*', registerJwt())
 const logger = getLogger()
 router.get('/', async (c) => {
   const { id } = getCurrentPayload(c)

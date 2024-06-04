@@ -4,7 +4,10 @@
     "drizzle:generate": "drizzle-kit generate:pg",
     "drizzle:push": "drizzle-kit push:pg",
     "drizzle:seed": "tsx src/drizzle/seed.ts",
-    "drizzle:migrate": "pnpm drizzle:generate && pnpm drizzle:push"
+    "drizzle:migrate": "pnpm drizzle:generate && pnpm drizzle:push",
+    "test:ui": "vitest --ui",
+    "test": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@hono/node-server": "1.11.1",
@@ -22,10 +25,13 @@
     "zod": "3.23.5"
   },
   "devDependencies": {
+    "@testcontainers/postgresql": "^10.9.0",
     "@types/bcrypt": "5.0.2",
     "@types/node": "20.12.8",
     "@types/pg": "8.11.5",
     "@typescript-eslint/eslint-plugin": "7.8.0",
+    "@vitest/coverage-v8": "^1.6.0",
+    "@vitest/ui": "^1.6.0",
     "drizzle-kit": "0.20.17",
     "eslint": "9.1.1",
     "eslint-config-prettier": "9.1.0",
@@ -36,6 +42,8 @@
     "eslint-plugin-promise": "6.1.1",
     "prettier": "3.2.5",
     "tsx": "4.8.2",
-    "typescript": "*"
+    "typescript": "*",
+    "vite-tsconfig-paths": "^4.3.2",
+    "vitest": "^1.6.0"
   }
 }

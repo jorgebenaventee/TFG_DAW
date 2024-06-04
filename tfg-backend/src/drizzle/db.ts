@@ -1,8 +1,14 @@
-import 'dotenv/config'
+import { config } from 'dotenv'
 import { Client } from 'pg'
 import * as process from 'process'
 import { drizzle } from 'drizzle-orm/node-postgres'
 import * as schema from './schema'
+
+if (process.env.NODE_ENV !== 'test') {
+  config()
+} else {
+  config({ path: './.env.test' })
+}
 
 const {
   POSTGRES_USER,

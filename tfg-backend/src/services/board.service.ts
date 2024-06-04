@@ -1,7 +1,16 @@
 import { type CreateBoardRequest } from '@/schemas/boards/create-board.schema'
 import { db } from '@/drizzle/db'
-import { type Board, boardTable, userBoardTable } from '@/drizzle/schema'
-import { eq } from 'drizzle-orm'
+import {
+  type Board,
+  boardTable,
+  columnTable,
+  tagTable,
+  taskTable,
+  taskTagTable,
+  userBoardTable,
+  userTaskTable,
+} from '@/drizzle/schema'
+import { eq, inArray } from 'drizzle-orm'
 import { HTTPException } from 'hono/http-exception'
 import * as path from 'path'
 import * as fs from 'fs/promises'
@@ -191,12 +200,61 @@ async function deleteBoard({
       message: 'No tienes permisos para eliminar este tablero',
     })
   }
-  await db.delete(userBoardTable).where(eq(userBoardTable.boardId, boardId))
-  await db.delete(boardTable).where(eq(boardTable.id, boardId))
+  const columns = await db.query.columnTable.findMany({
+    where: (column, { eq }) => eq(column.boardId, boardId),
+  })
+  const tags = await db.query.tagTable.findMany({
+    where: (tag, { eq }) => eq(tag.boardId, boardId),
+  })
+  const columnIds = columns.map((c) => c.id)
+  const tasks =
+    columnIds.length > 0
+      ? await db.query.taskTable.findMany({
+          where: (task, { inArray }) => inArray(task.columnId, columnIds),
+        })
+      : []
+  if (tasks.length > 0) {
+    const taskIds = tasks.map((t) => t.id)
+    await db
+      .delete(taskTagTable)
+      .where(inArray(taskTagTable.taskId, taskIds))
+      .execute()
+    await db
+      .delete(userTaskTable)
+      .where(inArray(userTaskTable.taskId, taskIds))
+      .execute()
+    await db.delete(taskTable).where(inArray(taskTable.id, taskIds)).execute()
+  }
+  if (tags.length > 0) {
+    await db
+      .delete(tagTable)
+      .where(
+        inArray(
+          tagTable.id,
+          tags.map((t) => t.id),
+        ),
+      )
+      .execute()
+  }
+  if (columnIds.length > 0) {
+    await db
+      .delete(taskTable)
+      .where(inArray(taskTable.columnId, columnIds))
+      .execute()
+  }
+  await db.delete(columnTable).where(eq(columnTable.boardId, boardId)).execute()
+  await db
+    .delete(userBoardTable)
+    .where(eq(userBoardTable.boardId, boardId))
+    .execute()
+  await db.delete(boardTable).where(eq(boardTable.id, boardId)).execute()
   logger.info('Tablero eliminado', {
     userId,
     boardId,
   })
+  if (boardToDelete.image != null) {
+    await fs.unlink(boardToDelete.image)
+  }
 }
 
 export const boardService = {
