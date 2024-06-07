@@ -4,7 +4,7 @@ import { apiFetch } from '@/utils/api-fetch.ts'
 export const boardSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
-  isAdmin: z.boolean(),
+  isAdmin: z.boolean().default(false),
   image: z
     .instanceof(File)
     .refine((file) => {

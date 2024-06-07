@@ -35,7 +35,7 @@ export function useCreateBoardForm() {
   })
   const createBoardForm = formFactory.useForm({
     onSubmit: ({ value }) => {
-      mutate(value)
+      mutate({ ...value, isAdmin: false })
     },
   })
 
