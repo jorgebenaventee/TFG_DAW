@@ -13,6 +13,7 @@ import { getLogger } from '@/utils/get-logger'
 import taskRouter from '@/routers/task.router'
 import userboardRouter from '@/routers/userboard.router'
 import tagRouter from './routers/tag.router'
+import * as process from 'node:process'
 
 if (process.env.NODE_ENV !== 'test') {
   config()
@@ -28,6 +29,7 @@ const envVariables = z.object({
   POSTGRES_HOST: z.string(),
   POSTGRES_PORT: z.string(),
   OPENAI_KEY: z.string(),
+  APP_PORT: z.string(),
 })
 
 envVariables.parse(process.env)
@@ -77,7 +79,7 @@ app.onError((e, { req }) => {
 })
 ;(async () => {
   await client.connect()
-  const port = 5000
+  const port = Number(process.env.APP_PORT)
   console.log(`Server is running on port ${port}`)
 
   serve({

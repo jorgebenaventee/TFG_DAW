@@ -20,6 +20,9 @@ import { login, setupDb } from './utils.test'
 import { Hono } from 'hono'
 import { taskService } from '@/services/task.service'
 
+const randomPort = Math.floor(Math.random() * (65535 - 1024) + 1024)
+process.env.APP_PORT = randomPort.toString()
+
 describe('Task router', () => {
   let postgresContainer: StartedPostgreSqlContainer
   let app: Hono

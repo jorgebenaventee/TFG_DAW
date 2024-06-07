@@ -47,7 +47,7 @@ router.post('/', zValidator('json', columnSchema), async (c) => {
     name,
   })
 
-  return c.json(column)
+  return c.json(column, { status: 201 })
 })
 
 router.put('/:id', zValidator('json', columnSchema), async (c) => {

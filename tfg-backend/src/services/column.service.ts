@@ -115,7 +115,7 @@ async function createColumn({
 
   const nextOrder = column?.order ?? -1
 
-  return await db
+  const columns = await db
     .insert(columnTable)
     .values({
       name,
@@ -124,6 +124,7 @@ async function createColumn({
     })
     .returning()
     .execute()
+  return columns[0]
 }
 
 async function editColumn({

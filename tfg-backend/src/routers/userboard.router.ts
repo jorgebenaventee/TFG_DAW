@@ -41,8 +41,12 @@ router.post(
   zValidator(
     'json',
     z.object({
-      username: z.string().min(1),
-      boardId: z.string().uuid(),
+      username: z
+        .string({ required_error: 'El nombre de usuario es obligatorio' })
+        .min(1),
+      boardId: z
+        .string({ required_error: 'El campo boardId es requerido' })
+        .uuid(),
       role: z.enum(['ADMIN', 'USER'], {
         message: 'El rol solo puede ser ADMIN o USER',
       }),
@@ -64,7 +68,7 @@ router.post(
       role,
     })
 
-    return c.json(userBoard)
+    return c.json(userBoard, { status: 201 })
   },
 )
 
@@ -73,8 +77,12 @@ router.delete(
   zValidator(
     'json',
     z.object({
-      userId: z.string().uuid(),
-      boardId: z.string().uuid(),
+      userId: z
+        .string({ required_error: 'El campo userId es requerido' })
+        .uuid(),
+      boardId: z
+        .string({ required_error: 'El campo boardId es requerido' })
+        .uuid(),
     }),
   ),
   async (c) => {

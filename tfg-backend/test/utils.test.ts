@@ -2,6 +2,7 @@ import { db } from '@/drizzle/db'
 import {
   boardTable,
   columnTable,
+  tagTable,
   taskTable,
   userBoardTable,
   userTable,
@@ -55,6 +56,16 @@ export async function setupDb() {
       name: 'Test',
       columnId: column.id,
       order: 0,
+    })
+    .returning()
+    .execute()
+
+  const [tag] = await db
+    .insert(tagTable)
+    .values({
+      name: 'Test',
+      color: '#ffffff',
+      boardId: board.id,
     })
     .returning()
     .execute()

@@ -14,6 +14,6 @@ router.post('/login', zValidator('json', loginSchema), async (c) => {
 router.post('/register', zValidator('json', loginSchema), async (c) => {
   const { username, password } = await c.req.json()
   const { token } = await userService.register({ username, password })
-  return c.json({ token })
+  return c.json({ token }, { status: 201 })
 })
 export default router

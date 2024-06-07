@@ -26,12 +26,12 @@ router.get(
 )
 router.get(
   '/:id',
-  zValidator('param', z.object({ tagId: z.string().uuid() })),
+  zValidator('param', z.object({ id: z.string().uuid() })),
   async (c) => {
     const { id: userId } = getCurrentPayload(c)
     const tagId = c.req.param('id')
     logger.info('Obteniendo etiqueta', { userId, tagId })
-    const tag = tagService.getTag({ userId, tagId })
+    const tag = await tagService.getTag({ userId, tagId })
     logger.info('Etiqueta obtenida', { userId, tagId })
     return c.json(tag)
   },
@@ -43,7 +43,7 @@ router.post('/', zValidator('json', tagMutationSchema), async (c) => {
   logger.info('Insertando etiqueta', { userId, tag })
   const newTag = await tagService.insertTag({ userId, tag })
   logger.info('Etiqueta insertada', { userId, newTag })
-  return c.json(newTag)
+  return c.json(newTag, { status: 201 })
 })
 
 router.put(
@@ -55,7 +55,7 @@ router.put(
     const tagId = c.req.param('tagId')
     const tag = await c.req.json()
     logger.info('Actualizando etiqueta', { userId, tagId, tag })
-    const updatedTag = await tagService.updateTag({ userId, tag })
+    const updatedTag = await tagService.updateTag({ userId, tag, tagId })
     logger.info('Etiqueta actualizada', { userId, tagId, updatedTag })
     return c.json(updatedTag)
   },

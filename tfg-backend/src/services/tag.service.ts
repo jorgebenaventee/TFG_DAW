@@ -44,18 +44,28 @@ async function checkAdminPermissions({
 async function insertTag({ userId, tag }: { userId: string; tag: Tag }) {
   logger.info('Insertando etiqueta', { userId, tag })
   await checkAdminPermissions({ userId, boardId: tag.boardId })
-  return await db.insert(tagTable).values(tag).returning().execute()
+  const [newTag] = await db.insert(tagTable).values(tag).returning().execute()
+  return newTag
 }
 
-async function updateTag({ userId, tag }: { userId: string; tag: Tag }) {
+async function updateTag({
+  userId,
+  tag,
+  tagId,
+}: {
+  tagId: string
+  userId: string
+  tag: Tag
+}) {
   logger.info('Actualizando etiqueta', { userId, tag })
   await checkAdminPermissions({ userId, boardId: tag.boardId })
-  return await db
+  const [newTag] = await db
     .update(tagTable)
     .set(tag)
-    .where(eq(tagTable.id, tag.id))
+    .where(eq(tagTable.id, tagId))
     .returning()
     .execute()
+  return newTag
 }
 
 async function deleteTag({ userId, tagId }: { userId: string; tagId: string }) {
@@ -73,7 +83,7 @@ async function deleteTag({ userId, tagId }: { userId: string; tagId: string }) {
   return await db.delete(tagTable).where(eq(tagTable.id, tagId)).execute()
 }
 
-async function getTasksInBoard({
+async function getTagsInBoard({
   userId,
   boardId,
 }: {
@@ -109,6 +119,6 @@ export const tagService = {
   insertTag,
   updateTag,
   deleteTag,
-  getTagsInBoard: getTasksInBoard,
+  getTagsInBoard,
   getTag,
 }

@@ -49,7 +49,7 @@ router.post('/', zValidator('form', createBoardSchema), async (c) => {
     image: imageFile,
     userId: id,
   })
-  return c.json(board)
+  return c.json(board, { status: 201 })
 })
 
 router.delete('/:id', async (c) => {
