@@ -1,4 +1,4 @@
-import { createTaskSchema, EditTask } from '@/api/task-api.ts'
+import { createTaskSchema, EditTask, taskApi } from '@/api/task-api.ts'
 import { zodValidator } from '@tanstack/zod-form-adapter'
 import { Label } from '@/components/ui/label.tsx'
 import { Input } from '@/components/ui/input.tsx'
@@ -19,6 +19,20 @@ import MultipleSelector, { Option } from '@/components/ui/multiple-selector.tsx'
 import { useTagsInBoard } from '@/hooks/useTagsInBoard.ts'
 import { useGenerateDescription } from '@/hooks/use-generate-description.ts'
 import React, { useRef } from 'react'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog.tsx'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useToast } from '@/components/ui/use-toast.ts'
+import { QUERY_KEYS } from '@/constants/query.constants.ts'
 
 export function EditTaskForm({
   boardId,
@@ -27,6 +41,29 @@ export function EditTaskForm({
   boardId: string
   task: EditTask
 }) {
+  const queryClient = useQueryClient()
+  const { toast } = useToast()
+  const { mutate } = useMutation({
+    mutationFn: () => taskApi.deleteTask(task.id),
+    onSuccess: async () => {
+      toast({
+        title: 'Tarea eliminada',
+        description: 'La tarea ha sido eliminada con éxito',
+      })
+      await queryClient.refetchQueries({
+        queryKey: QUERY_KEYS.COLUMNS({ boardId }),
+      })
+    },
+    onError: (error) => {
+      const errorResponse = JSON.parse(error.message)
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description:
+          errorResponse.message ?? 'Ha ocurrido un error al borrar el tablero',
+      })
+    },
+  })
   const { editTaskForm } = useEditTaskForm({
     boardId,
     task,
@@ -263,9 +300,42 @@ export function EditTaskForm({
           )}
         </editTaskForm.Field>
       </form>
-      <Button form="create-board-form" className="w-fit min-w-36">
-        Editar tarea
-      </Button>
+      <div className="flex gap-2">
+        <Button form="create-board-form" className="w-fit min-w-36">
+          Editar tarea
+        </Button>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button type="button" data-delete-button variant="destructive">
+              Eliminar tarea
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle asChild>
+                <h2 className="text-balance font-semibold">
+                  ¿Estás seguro que quieres eliminar la tarea {task.name}?
+                </h2>
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                <p className="font-semibold text-red-500">
+                  Esta acción no se puede deshacer
+                </p>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-destructive hover:bg-destructive/90"
+                data-delete-button
+                onClick={() => mutate()}
+              >
+                Eliminar
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
     </editTaskForm.Provider>
   )
 }

@@ -10,6 +10,7 @@ import {
 import { getLogger } from '@/utils/get-logger'
 import { userBoardService } from '@/services/userboard.service'
 import { and, eq } from 'drizzle-orm'
+import { taskService } from '@/services/task.service'
 
 const logger = getLogger()
 
@@ -159,6 +160,48 @@ async function editColumn({
   }
 }
 
+async function deleteColumn({
+  userId,
+  columnId,
+}: {
+  userId: string
+  columnId: string
+}) {
+  const column = await db
+    .select()
+    .from(columnTable)
+    .where(and(eq(columnTable.id, columnId)))
+    .execute()
+  if (column.length === 0) {
+    throw new HTTPException(404, { message: 'No se ha encontrado la columna' })
+  }
+  const isAdmin = await hasAdminPermissions({
+    userId,
+    boardId: column[0].boardId,
+  })
+  if (!isAdmin) {
+    logger.error('No tienes permiso para eliminar columnas en este tablero', {
+      userId,
+      boardId: column[0].boardId,
+    })
+    throw new HTTPException(403, {
+      message: 'No tienes permiso para eliminar columnas en este tablero',
+    })
+  }
+
+  const tasks = await db
+    .select()
+    .from(taskTable)
+    .where(and(eq(taskTable.columnId, columnId)))
+    .execute()
+
+  for (const task of tasks) {
+    await taskService.deleteTask({ userId, taskId: task.id })
+  }
+
+  await db.delete(columnTable).where(eq(columnTable.id, columnId)).execute()
+}
+
 async function hasAdminPermissions({
   userId,
   boardId,
@@ -191,4 +234,5 @@ export const columnService = {
   getColumns,
   createColumn,
   editColumn,
+  deleteColumn,
 }

@@ -80,6 +80,10 @@ function updateTask({
   )
 }
 
+function deleteTask(taskId: string) {
+  return apiFetch(`/task/${taskId}`, { method: 'DELETE' })
+}
+
 function moveTask(data: {
   taskId: string
   newColumnId: string
@@ -99,4 +103,5 @@ export const taskApi = {
   createTask,
   updateTask,
   moveTask,
+  deleteTask,
 }

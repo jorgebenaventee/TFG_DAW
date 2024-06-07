@@ -12,11 +12,18 @@ async function checkPermissions({
 }: {
   userId: string
   boardId: string
-}) {
+}): Promise<UserBoard['role']> {
   logger.info('Verificando permisos', {
     boardId,
     userId,
   })
+  const user = await db.query.userTable.findFirst({
+    where: (user, { eq }) => eq(user.id, userId),
+    columns: {
+      isSuperAdmin: true,
+    },
+  })
+  if (user?.isSuperAdmin) return 'ADMIN'
   const [userBoard] = await db
     .select()
     .from(userBoardTable)
@@ -145,9 +152,20 @@ async function removeUserFromBoard({
     .execute()
 }
 
+async function isAdminInBoard({
+  boardId,
+  userId,
+}: {
+  boardId: string
+  userId: string
+}) {
+  return (await checkPermissions({ userId, boardId })) === 'ADMIN'
+}
+
 export const userBoardService = {
   checkPermissions,
   getUsersInBoard,
   addUserToBoard,
   removeUserFromBoard,
+  isAdminInBoard,
 }

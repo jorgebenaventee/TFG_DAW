@@ -37,7 +37,7 @@ function Board() {
     <>
       <div className="mt-3 flex gap-4">
         <h1 className="px-4 py-2 font-bold">{board && board.name}</h1>
-        <CreateColumnPopover boardId={boardId} />
+        {board?.isAdmin && <CreateColumnPopover boardId={boardId} />}
       </div>
       <div className="flex h-full flex-nowrap gap-6 p-3">
         {isLoading && <ColumnsSkeleton />}

@@ -3,10 +3,13 @@ import { db } from '@/drizzle/db'
 import {
   type Board,
   boardTable,
+  BoardVm,
   columnTable,
   tagTable,
   taskTable,
   taskTagTable,
+  User,
+  UserBoard,
   userBoardTable,
   userTaskTable,
 } from '@/drizzle/schema'
@@ -18,26 +21,40 @@ import { getLogger } from '@/utils/get-logger'
 
 const logger = getLogger()
 
-function mapBoard(board: Board) {
-  if (board.image != null) {
-    const image = path.basename(board.image)
+function mapBoard(board: Board, userBoard?: UserBoard, currentUser?: User) {
+  const boardVm: BoardVm = {
+    ...board,
+    isAdmin: Boolean(currentUser?.isSuperAdmin || userBoard?.role === 'ADMIN'),
+  }
+  if (boardVm.image != null) {
+    const image = path.basename(boardVm.image)
     const hyphenIndex = image.indexOf('-')
     const name = image.slice(hyphenIndex + 1)
     return {
-      ...board,
+      ...boardVm,
       image: name,
     }
   }
-  return board
+  return boardVm
 }
 
 async function getBoards({ userId }: { userId: string }) {
   logger.info('Obteniendo tableros', { userId })
+  const user = await db.query.userTable.findFirst({
+    where: (user, { eq }) => eq(user.id, userId),
+  })
+  if (!user) {
+    throw new HTTPException(403, {
+      message: 'No tienes permisos para ver los tableros',
+    })
+  }
+
+  if (user.isSuperAdmin) {
+    const allBoards = await db.query.boardTable.findMany()
+    return allBoards.map((board) => mapBoard(board, undefined, user))
+  }
   const userBoards = await db.query.userBoardTable.findMany({
     where: (userBoard, { eq }) => eq(userBoard.userId, userId),
-    columns: {
-      boardId: true,
-    },
   })
 
   if (userBoards.length === 0) {
@@ -55,7 +72,9 @@ async function getBoards({ userId }: { userId: string }) {
     userId,
     boards: boards.length,
   })
-  return boards.map(mapBoard)
+  return boards.map((board) =>
+    mapBoard(board, userBoards.find((ub) => ub.boardId === board.id)!, user),
+  )
 }
 
 async function getBoard({
@@ -66,15 +85,15 @@ async function getBoard({
   boardId: string
 }) {
   logger.info('Obteniendo tablero', { userId, boardId })
+  const user = await db.query.userTable.findFirst({
+    where: (user, { eq }) => eq(user.id, userId),
+  })
   const userBoard = await db.query.userBoardTable.findFirst({
     where: (userBoard, { eq, and }) =>
       and(eq(userBoard.userId, userId), eq(userBoard.boardId, boardId)),
-    columns: {
-      boardId: true,
-    },
   })
 
-  if (!userBoard) {
+  if (!user?.isSuperAdmin && !userBoard) {
     logger.error('El usuario no pertenece al tablero', { userId, boardId })
     throw new HTTPException(403, {
       message: 'No tienes permiso para ver este tablero',
@@ -85,7 +104,7 @@ async function getBoard({
     where: (board, { eq }) => eq(board.id, boardId),
   }))!
 
-  return mapBoard(board)
+  return mapBoard(board, userBoard, user)
 }
 
 async function getBoardImage({ boardId }: { boardId: string }) {

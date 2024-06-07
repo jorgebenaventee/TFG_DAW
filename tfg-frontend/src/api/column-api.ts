@@ -34,8 +34,16 @@ function editColumn(id: Column['id'], data: { name: string; boardId: string }) {
   })
 }
 
+function deleteColumn(id: Column['id']) {
+  return apiFetch(`/column/${id}`, {
+    method: 'DELETE',
+    responseIsJson: false,
+  })
+}
+
 export const columnApi = {
   getColumns,
   createColumn,
   editColumn,
+  deleteColumn,
 }

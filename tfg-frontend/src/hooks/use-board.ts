@@ -5,6 +5,13 @@ import { useQuery } from '@tanstack/react-query'
 export function useBoard({ boardId }: { boardId: string }) {
   return useQuery({
     queryKey: QUERY_KEYS.BOARD({ boardId }),
-    queryFn: () => boardApi.getBoard({ boardId }),
+    queryFn: () => {
+      if (!boardId) {
+        return {
+          isAdmin: false,
+        }
+      }
+      return boardApi.getBoard({ boardId })
+    },
   })
 }

@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dialog.tsx'
 import { EditTaskForm } from '@/components/EditTaskForm.tsx'
 import { MoveIcon } from '@/components/icons/move-icon.tsx'
-import { EditColumnButton } from './EditColumnButton'
+import { ColumnDropdownMenu } from './ColumnDropdownMenu.tsx'
 
 export function Column({ column }: { column: ColumnType }) {
   return (
@@ -26,7 +26,7 @@ export function Column({ column }: { column: ColumnType }) {
             <h3 className="truncate text-lg font-semibold" title={column.name}>
               {column.name}
             </h3>
-            <EditColumnButton column={column} />
+            <ColumnDropdownMenu column={column} />
           </div>
           <div>
             <CreateTaskDialog boardId={column.boardId} columnId={column.id} />

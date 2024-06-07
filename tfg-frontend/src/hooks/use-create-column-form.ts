@@ -25,6 +25,15 @@ export function useCreateColumnForm({ boardId }: { boardId: string }) {
         queryKey: QUERY_KEYS.COLUMNS({ boardId }),
       })
     },
+    onError: (error) => {
+      const errorResponse = JSON.parse(error.message)
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description:
+          errorResponse.message ?? 'Ha ocurrido un error al crear la columna',
+      })
+    },
   })
 
   const createColumnForm = formFactory.useForm({

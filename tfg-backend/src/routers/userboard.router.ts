@@ -20,6 +20,22 @@ router.get('/:boardId/users', async (c) => {
   return c.json(usersInBoard)
 })
 
+router.get(
+  '/:boardId/admin',
+  zValidator('param', z.object({ boardId: z.string().uuid() })),
+  async (c) => {
+    const { id } = getCurrentPayload(c)
+    const { boardId } = c.req.param()
+
+    const isAdmin = await userBoardService.isAdminInBoard({
+      userId: id,
+      boardId,
+    })
+
+    return c.json({ isAdmin })
+  },
+)
+
 router.post(
   '/',
   zValidator(

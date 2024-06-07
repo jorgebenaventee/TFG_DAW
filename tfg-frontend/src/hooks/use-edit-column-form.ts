@@ -25,7 +25,7 @@ export function useEditColumnForm({
     }: {
       value: { name: string; boardId: string }
     }) => {
-      columnApi.editColumn(column.id, value)
+      await columnApi.editColumn(column.id, value)
     },
     onSuccess: async () => {
       toast({
@@ -34,6 +34,15 @@ export function useEditColumnForm({
       })
       await queryClient.refetchQueries({
         queryKey: QUERY_KEYS.COLUMNS({ boardId }),
+      })
+    },
+    onError: (error) => {
+      const errorResponse = JSON.parse(error.message)
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description:
+          errorResponse.message ?? 'Ha ocurrido un error al editar la columna',
       })
     },
   })

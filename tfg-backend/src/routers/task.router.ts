@@ -75,6 +75,16 @@ router.put('/:id', zValidator('json', editTaskSchema), async (c) => {
 
   return c.json(updatedTask)
 })
+router.delete('/:id', async (c) => {
+  const { id } = getCurrentPayload(c)
+  const taskId = c.req.param('id')
+  logger.info('Deleting task', { taskId })
+  await taskService.deleteTask({
+    userId: id,
+    taskId,
+  })
+  return c.json({ message: 'Tarea eliminado' })
+})
 
 router.get(
   '/ai/description',

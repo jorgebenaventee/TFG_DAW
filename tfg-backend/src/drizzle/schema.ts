@@ -1,4 +1,5 @@
 import {
+  boolean,
   integer,
   pgEnum,
   pgTable,
@@ -21,6 +22,7 @@ export const userTable = pgTable(
     name: varchar('name', { length: 100 }).notNull().default(''),
     lastName: varchar('lastName', { length: 100 }).notNull().default(''),
     id: uuid('id').primaryKey().notNull().defaultRandom(),
+    isSuperAdmin: boolean('isSuperAdmin').notNull().default(false),
   },
   (table) => {
     return {
@@ -283,3 +285,7 @@ export type UserTask = InferSelectModel<typeof userTaskTable>
 export type TaskTag = InferSelectModel<typeof taskTagTable>
 export type UserBoard = InferSelectModel<typeof userBoardTable>
 export type UserBoardRole = (typeof userBoardRole.enumValues)[number]
+
+export type BoardVm = Board & {
+  isAdmin: boolean
+}

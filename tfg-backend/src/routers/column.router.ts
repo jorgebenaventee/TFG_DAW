@@ -61,4 +61,15 @@ router.put('/:id', zValidator('json', columnSchema), async (c) => {
 
   return new Response(null, { status: 204 })
 })
+
+router.delete('/:id', async (c) => {
+  const { id: userId } = getCurrentPayload(c)
+  const { id: columnId } = c.req.param()
+
+  logger.info('Eliminando columna', { userId, columnId })
+  await columnService.deleteColumn({ userId, columnId })
+  logger.info('Columna eliminada', { userId, columnId })
+
+  return new Response(null, { status: 204 })
+})
 export default router

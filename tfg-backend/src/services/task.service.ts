@@ -148,6 +148,53 @@ async function editTask({
   return savedTask
 }
 
+async function deleteTask({
+  userId,
+  taskId,
+}: {
+  userId: string
+  taskId: string
+}) {
+  logger.info('Eliminando tarea', {
+    userId,
+    taskId,
+  })
+  const taskToDelete = await db.query.taskTable.findFirst({
+    where: (task, { eq }) => eq(task.id, taskId),
+  })
+  if (taskToDelete == null) {
+    logger.error('No se encontró la tarea', { taskId })
+    throw new HTTPException(404, {
+      message: `La tarea con id ${taskId} no existe`,
+    })
+  }
+  const column = await db.query.columnTable.findFirst({
+    where: (column, { eq }) => eq(column.id, taskToDelete.columnId),
+  })
+  if (column == null) {
+    logger.error('No se encontró la columna', { taskId })
+    throw new HTTPException(404, {
+      message: `La columna con id ${taskToDelete.columnId} no existe`,
+    })
+  }
+  await checkPermissions({
+    userId,
+    boardId: column.boardId,
+    columnId: taskToDelete.columnId,
+  })
+
+  await db.delete(taskTagTable).where(eq(taskTagTable.taskId, taskId)).execute()
+  await db
+    .delete(userTaskTable)
+    .where(eq(userTaskTable.taskId, taskId))
+    .execute()
+  await db.delete(taskTable).where(eq(taskTable.id, taskId)).execute()
+  logger.info('Tarea eliminada', {
+    userId,
+    taskId,
+  })
+}
+
 async function moveTask({
   userId,
   taskId,
@@ -433,4 +480,5 @@ export const taskService = {
   moveTask,
   editTask,
   generateDescription,
+  deleteTask,
 }
