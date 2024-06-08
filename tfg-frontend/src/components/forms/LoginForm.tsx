@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { zodValidator } from '@tanstack/zod-form-adapter'
 import { Button } from '@/components/ui/button.tsx'
 import { useLoginForm } from '@/hooks/use-login-form.ts'
+import { Link } from '@tanstack/react-router'
 
 export function LoginForm() {
   const { loginForm } = useLoginForm()
@@ -76,6 +77,11 @@ export function LoginForm() {
                 )}
               />
               <Button variant="default">Iniciar sesión</Button>
+              <Link to="/register">
+                <small className="m-0 p-0 text-sm text-gray-500">
+                  ¿No tienes cuenta? Regístrate
+                </small>
+              </Link>
             </form>
           </loginForm.Provider>
         </CardContent>

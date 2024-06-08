@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { zodValidator } from '@tanstack/zod-form-adapter'
 import { Button } from '@/components/ui/button.tsx'
 import { useRegisterForm } from '@/hooks/use-register-form.ts'
+import { Link } from '@tanstack/react-router'
 
 export function RegisterForm() {
   const { registerForm } = useRegisterForm()
@@ -113,6 +114,11 @@ export function RegisterForm() {
                 )}
               />
               <Button variant="default">Registrarse</Button>
+              <Link to="/login">
+                <small className="m-0 p-0 text-sm text-gray-500">
+                  ¿Ya tienes cuenta? Inicia sesión
+                </small>
+              </Link>
             </form>
           </registerForm.Provider>
         </CardContent>
