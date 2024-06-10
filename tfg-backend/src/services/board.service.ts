@@ -209,8 +209,14 @@ async function deleteBoard({
     where: (ub, { and, eq }) =>
       and(eq(ub.boardId, boardId), eq(ub.userId, userId)),
   })
+  const user = await db.query.userTable.findFirst({
+    where: (user, { eq }) => eq(user.id, userId),
+  })
 
-  if (userBoard == null || userBoard.role !== 'ADMIN') {
+  if (
+    !user?.isSuperAdmin &&
+    (userBoard == null || userBoard.role !== 'ADMIN')
+  ) {
     logger.error('Usuario no tiene permisos para borrar el tablero', {
       userId,
       boardId,
